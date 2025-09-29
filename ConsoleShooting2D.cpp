@@ -249,6 +249,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         switch (wParam) //눌린 키의 가상키코드
         {
+        case 'A':
 		case VK_LEFT: //왼쪽 방향키
 			OutputDebugStringW(L"Left Key Pressed\n");
 #ifdef KHS_PACKMAN
@@ -256,6 +257,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 #endif
 			InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
             break;
+		case 'D':
 		case VK_RIGHT: //오른쪽 방향키
 			OutputDebugStringW(L"Right Key Pressed\n");
 #ifdef KHS_PACKMAN
@@ -263,6 +265,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 #endif
             InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
 			break;
+		case 'W':
 		case VK_UP: //위쪽 방향키
 			OutputDebugStringW(L"Up Key Pressed\n");
 #ifdef KHS_PACKMAN
@@ -270,6 +273,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 #endif
             InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
 			break;
+		case 'S':
 		case VK_DOWN: //아래쪽 방향키
 			OutputDebugStringW(L"Down Key Pressed\n");
 #ifdef KHS_PACKMAN
