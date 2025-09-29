@@ -203,8 +203,27 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			Gdiplus::Graphics graphicInstance(hdc); //GDI+ 그래픽 객체 생성
 
-			Gdiplus::SolidBrush  brush(Gdiplus::Color(255, 255, 0, 0)); //붉은색 브러시 객체 생성 (불투명도, R, G, B)
-			graphicInstance.FillEllipse(&brush, 100, 100, 200, 200); //타원 채우기 (브러시, x좌표, y좌표, 너비, 높이)
+			Gdiplus::SolidBrush  redBrush(Gdiplus::Color(255, 255, 0, 0)); //붉은색 브러시 객체 생성 (불투명도, R, G, B)
+			Gdiplus::SolidBrush  blueBrush(Gdiplus::Color(255, 0, 0, 255)); //파란색 브러시 객체 생성 (불투명도, R, G, B)
+			graphicInstance.FillEllipse(&redBrush, 100, 100, 200, 200); //타원 채우기 (브러시, x좌표, y좌표, 너비, 높이)
+            graphicInstance.FillRectangle(&blueBrush, 400, 100, 200, 200); //사각형 채우기 (브러시, x좌표, y좌표, 너비, 높이)
+
+			Gdiplus::Pen greenPen(Gdiplus::Color(255, 0, 255, 0), 5); //초록색 펜 객체 생성 (색상, 두께)
+			graphicInstance.DrawLine(&greenPen, 700, 100, 900, 300);
+
+			Gdiplus::Pen blackPen(Gdiplus::Color(255, 0, 0, 0), 3); //검은색 펜 객체 생성 (색상, 두께)
+			Gdiplus::Point points[4] = { Gdiplus::Point(1000,100), Gdiplus::Point(1200,100), Gdiplus::Point(1100,300), Gdiplus::Point(900,300) };
+			graphicInstance.FillPolygon(&blueBrush, points, 4); //다각형 그리기 (펜, 점 배열, 점 개수)
+
+            //집모양그리기
+            Gdiplus::Point housePoints[5] = {
+                Gdiplus::Point(300, 400), //왼쪽 아래
+                Gdiplus::Point(500, 400), //오른쪽 아래
+                Gdiplus::Point(500, 600), //오른쪽 위
+                Gdiplus::Point(300, 600), //왼쪽 위
+                Gdiplus::Point(200, 500)  //꼭대기
+			};
+			graphicInstance.DrawPolygon(&blackPen, housePoints, 5); //다각형 채우기 (브러시, 점 배열, 점 개수)
 
             EndPaint(hWnd, &ps);
         }
