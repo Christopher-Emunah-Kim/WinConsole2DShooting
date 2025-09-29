@@ -5,6 +5,11 @@
 #include "framework.h"
 #include "ConsoleShooting2D.h"
 
+//메모리 릭 체크
+#define _CRTDBG_MAP_ALLOC;
+#define new new(_NORMAL_BLOCK, __FILE__, __LINE__);
+#include <crtdbg.h>
+
 #define MAX_LOADSTRING 100
 
 // 전역 변수:
@@ -28,6 +33,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //IN
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: 여기에 코드를 입력합니다.
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); //메모리 릭 체크
+
+
 
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -121,10 +129,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    //윈도우콘솔 타이틀 수정
    SetConsoleTitle(L"Win Console Shooting 2D");
-
-
-
-
 
    //실제 윈도우 생성
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME,  //윈도우 스타일 (최대화 버튼 제거 연산, 테두리 크기 변경 제거 연산) 
