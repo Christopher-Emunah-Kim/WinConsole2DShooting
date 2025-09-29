@@ -6,9 +6,9 @@
 #include "ConsoleShooting2D.h"
 
 //메모리 릭 체크
-#define _CRTDBG_MAP_ALLOC;
-#define new new(_NORMAL_BLOCK, __FILE__, __LINE__);
-#include <crtdbg.h>
+#define _CRTDBG_MAP_ALLOC //CRT의 메모리할당함수(malloc, calloc, realloc, free)를 디버그 버전으로 매핑
+#define new new(_NORMAL_BLOCK, __FILE__, __LINE__) //new연산자를 디버그용으로 재정의. 누수된 메몰블록의 파일명, 라인번호까지 출력
+#include <crtdbg.h> //C 런타임 디버그 헤더
 
 #define MAX_LOADSTRING 100
 
@@ -34,6 +34,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //IN
 
     // TODO: 여기에 코드를 입력합니다.
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); //메모리 릭 체크
+	//CRT디버그 플래그 설정. 디버그 힙 기능활성, 메모리 릭 체크 활성화
 
 
 
