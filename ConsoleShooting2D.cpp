@@ -232,6 +232,39 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             EndPaint(hWnd, &ps);
         }
         break;
+    case WM_KEYDOWN:
+    {
+        switch (wParam) //눌린 키의 가상키코드
+        {
+		case VK_LEFT: //왼쪽 방향키
+			OutputDebugStringW(L"Left Key Pressed\n");
+			InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
+            break;
+		case VK_RIGHT: //오른쪽 방향키
+			OutputDebugStringW(L"Right Key Pressed\n");
+            InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
+			break;
+		case VK_UP: //위쪽 방향키
+			OutputDebugStringW(L"Up Key Pressed\n");
+            InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
+			break;
+		case VK_DOWN: //아래쪽 방향키
+			OutputDebugStringW(L"Down Key Pressed\n");
+            InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
+			break;
+		case VK_SPACE: //스페이스바
+			OutputDebugStringW(L"Space Key Pressed\n");
+            InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
+			break;
+        case VK_ESCAPE: //ESC키
+            DestroyWindow(hWnd); //윈도우 종료
+			break;
+
+        default:
+			break;
+        }
+    }
+    break;
 	case WM_DESTROY: //윈도우가 파괴될 때 (종료)
         PostQuitMessage(0);
         break;
