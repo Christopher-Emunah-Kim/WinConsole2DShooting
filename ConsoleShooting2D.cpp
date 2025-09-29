@@ -33,8 +33,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //IN
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: 여기에 코드를 입력합니다.
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); //메모리 릭 체크
-	//CRT디버그 플래그 설정. 디버그 힙 기능활성, 메모리 릭 체크 활성화
+
+     //메모리 릭 체크
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	//CRT디버그 플래그 설정. 디버그 힙 기능활성, 메모리 릭 체크 활성화, 프로그램 종료 시 메모리 누수보고서 출력
+
+	//GDI+ 초기화
+	ULONG_PTR dwGdiplusToken; //GDI+ 토큰
+	Gdiplus::GdiplusStartupInput gdiplusStartupInput; //GDI+ 시작 구조체
+	Gdiplus::GdiplusStartup(&dwGdiplusToken, &gdiplusStartupInput, nullptr); //GDI+ 시작snsk qn
 
 
 
@@ -70,6 +77,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //IN
 			DispatchMessage(&msg); //메시지를 해당 윈도우 프로시저로 전달
         }
     }
+
+
+	//GDI+ 종료
+	Gdiplus::GdiplusShutdown(dwGdiplusToken);
 
     return (int) msg.wParam;
 }
