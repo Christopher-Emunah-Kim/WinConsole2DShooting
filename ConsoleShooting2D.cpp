@@ -200,6 +200,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
+
+			Gdiplus::Graphics graphicInstance(hdc); //GDI+ 그래픽 객체 생성
+
+			Gdiplus::SolidBrush  brush(Gdiplus::Color(255, 255, 0, 0)); //붉은색 브러시 객체 생성 (불투명도, R, G, B)
+			graphicInstance.FillEllipse(&brush, 100, 100, 200, 200); //타원 채우기 (브러시, x좌표, y좌표, 너비, 높이)
+
             EndPaint(hWnd, &ps);
         }
         break;
