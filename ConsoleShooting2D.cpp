@@ -257,8 +257,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		//bool bIsInitialKeyPress = ((lParam & (1 << 30)) == 0); //키가 처음 눌렸는지 여부 (자동반복 방지)
 
         //if (bIsInitialKeyPress)
-        //{
-           // gActiveKey = (UINT)wParam; //현재 눌린 키 저장
+       // {
+           //gActiveKey = (UINT)wParam; //현재 눌린 키 저장
 
             switch (wParam) //눌린 키의 가상키코드
             {
@@ -312,14 +312,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         //}
     }
     break;
-  //  case WM_KEYUP:
+    case WM_KEYUP:
   //  {
   //      if ((UINT)wParam == gActiveKey) //떼어진 키가 현재 눌린 키인지 확인
   //      {
   //          gActiveKey = 0; //현재 눌린 키 초기화
 		//}
   //  }
-
+    break;
 	case WM_DESTROY: //윈도우가 파괴될 때 (종료)
 #ifdef KHS_PACKMAN
         if (k_packman)
