@@ -21,8 +21,8 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름�
 
 
 #ifdef KHS_PACKMAN
-////250929 KHS PackMan 객체 생성
-PackMan k_packman(100, 100, 100, 100, 20, 30.0f, 300.0f); //시작x좌표, 시작y좌표, 너비, 높이, 속도, 시작각도, 호의각도
+////250929 KHS PackMan 객체 포인터 생성
+PackMan* k_packman = nullptr;
 
 #endif
 
@@ -167,6 +167,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
       return FALSE;
    }
 
+#ifdef KHS_PACKMAN
+   k_packman = new PackMan(100, 100, 100, 100, 20, 30.0f, 300.0f); //PackMan 객체 생성
+#endif
+
    ShowWindow(hWnd, nCmdShow); //윈도우를 화면에 표시
    UpdateWindow(hWnd); //윈도우의 클라이언트 영역을 업데이트
 
@@ -183,6 +187,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
 //
 //
+//UINT gActiveKey = 0; //현재 눌린 키 저장용 전역변수
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
@@ -239,7 +245,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			//graphicInstance.FillPie(&yellowBrush, 400, 200, 200, 200, 30, 300); //타원 채우기 (브러시, x좌표, y좌표, 너비, 높이, 시작각도, 호의 각도)
 
 #ifdef KHS_PACKMAN
-			k_packman.Draw(graphicInstance); //PackMan 그리기
+            if(k_packman)
+    			k_packman->Draw(graphicInstance); //PackMan 그리기
 #endif
 
             EndPaint(hWnd, &ps);
@@ -247,54 +254,80 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_KEYDOWN:
     {
-        switch (wParam) //눌린 키의 가상키코드
-        {
-        case 'A':
-		case VK_LEFT: //왼쪽 방향키
-			OutputDebugStringW(L"Left Key Pressed\n");
-#ifdef KHS_PACKMAN
-			k_packman.MoveLeft(); //PackMan 왼쪽 이동
-#endif
-			InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
-            break;
-		case 'D':
-		case VK_RIGHT: //오른쪽 방향키
-			OutputDebugStringW(L"Right Key Pressed\n");
-#ifdef KHS_PACKMAN
-			k_packman.MoveRight(); //PackMan 오른쪽 이동
-#endif
-            InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
-			break;
-		case 'W':
-		case VK_UP: //위쪽 방향키
-			OutputDebugStringW(L"Up Key Pressed\n");
-#ifdef KHS_PACKMAN
-			k_packman.MoveUp(); //PackMan 위쪽 이동
-#endif
-            InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
-			break;
-		case 'S':
-		case VK_DOWN: //아래쪽 방향키
-			OutputDebugStringW(L"Down Key Pressed\n");
-#ifdef KHS_PACKMAN
-			k_packman.MoveDown(); //PackMan 아래쪽 이동
-#endif
-            InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
-			break;
-		case VK_SPACE: //스페이스바
-            OutputDebugStringW(L"Space Key Pressed\n");
-            InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
-			break;
-        case VK_ESCAPE: //ESC키
-            DestroyWindow(hWnd); //윈도우 종료
-			break;
+		//bool bIsInitialKeyPress = ((lParam & (1 << 30)) == 0); //키가 처음 눌렸는지 여부 (자동반복 방지)
 
-        default:
-			break;
-        }
+        //if (bIsInitialKeyPress)
+        //{
+           // gActiveKey = (UINT)wParam; //현재 눌린 키 저장
+
+            switch (wParam) //눌린 키의 가상키코드
+            {
+            case 'A':
+            case VK_LEFT: //왼쪽 방향키
+                OutputDebugStringW(L"Left Key Pressed\n");
+#ifdef KHS_PACKMAN
+				if (k_packman)
+                    k_packman->MoveLeft(); //PackMan 왼쪽 이동
+#endif
+                InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
+                break;
+            case 'D':
+            case VK_RIGHT: //오른쪽 방향키
+                OutputDebugStringW(L"Right Key Pressed\n");
+#ifdef KHS_PACKMAN
+                if (k_packman)
+                    k_packman->MoveRight(); //PackMan 오른쪽 이동
+#endif
+                InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
+                break;
+            case 'W':
+            case VK_UP: //위쪽 방향키
+                OutputDebugStringW(L"Up Key Pressed\n");
+#ifdef KHS_PACKMAN
+                if (k_packman)
+                    k_packman->MoveUp(); //PackMan 위쪽 이동
+#endif
+                InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
+                break;
+            case 'S':
+            case VK_DOWN: //아래쪽 방향키
+                OutputDebugStringW(L"Down Key Pressed\n");
+#ifdef KHS_PACKMAN
+                if (k_packman)
+                    k_packman->MoveDown(); //PackMan 아래쪽 이동
+#endif
+                InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
+                break;
+            case VK_SPACE: //스페이스바
+                OutputDebugStringW(L"Space Key Pressed\n");
+                InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
+                break;
+            case VK_ESCAPE: //ESC키
+                DestroyWindow(hWnd); //윈도우 종료
+                break;
+
+            default:
+                break;
+            }
+        //}
     }
     break;
+  //  case WM_KEYUP:
+  //  {
+  //      if ((UINT)wParam == gActiveKey) //떼어진 키가 현재 눌린 키인지 확인
+  //      {
+  //          gActiveKey = 0; //현재 눌린 키 초기화
+		//}
+  //  }
+
 	case WM_DESTROY: //윈도우가 파괴될 때 (종료)
+#ifdef KHS_PACKMAN
+        if (k_packman)
+        {
+            delete k_packman; //PackMan 객체 삭제
+            k_packman = nullptr;
+		}
+#endif
         PostQuitMessage(0);
         break;
     default:
