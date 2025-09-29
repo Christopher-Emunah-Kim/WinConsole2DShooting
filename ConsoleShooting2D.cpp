@@ -18,11 +18,12 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //IN 
+                     _In_opt_ HINSTANCE hPrevInstance, //IN OPTIONAL
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
+    //레거시 코드에서 넘어온 현재는 사용하지않는 파라미터들.
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
@@ -31,25 +32,33 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_CONSOLESHOOTING2D, szWindowClass, MAX_LOADSTRING);
-    MyRegisterClass(hInstance);
 
-    // 애플리케이션 초기화를 수행합니다:
+	MyRegisterClass(hInstance); //Window Class 등록 (중요~!!)
+
+    // 애플리케이션 초기화를 수행합니다: (중요~!!)
     if (!InitInstance (hInstance, nCmdShow))
     {
         return FALSE;
     }
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_CONSOLESHOOTING2D));
+	//HACCEL : 단축키(Accelerator) 테이블 핸들
+    //LoadAccelerators함수 : 단축키(Accelerator) 테이블을 로드
+	//hInstance : 애플리케이션 인스턴스 핸들
+	//MAKEINTRESOURCE : 정수를 리소스 식별자로 변환하는 매크로
+	//IDC_CONSOLESHOOTING2D : 단축키 리소스 ID
+
 
     MSG msg;
+	// MSG : 윈도우 메시지 구조체
 
-    // 기본 메시지 루프입니다:
+	// 기본 메시지 루프입니다: (메시지 큐에 들어온 메시지를 처리하는 반복문) (중요~!!)
     while (GetMessage(&msg, nullptr, 0, 0))
     {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) //단축키 메시지인지 확인
         {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+			TranslateMessage(&msg); //키보드 메시지를 변환 (가상키코드를 문자메시지로 변환)
+			DispatchMessage(&msg); //메시지를 해당 윈도우 프로시저로 전달
         }
     }
 
@@ -65,21 +74,33 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 //
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
-    WNDCLASSEXW wcex;
+    WNDCLASSEXW wcex; //WINDOW CLASS Extended 유니코드 버전(WIndow창 모양 등록용 구조체)
 
     wcex.cbSize = sizeof(WNDCLASSEX);
 
-    wcex.style          = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc    = WndProc;
-    wcex.cbClsExtra     = 0;
-    wcex.cbWndExtra     = 0;
-    wcex.hInstance      = hInstance;
-    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_CONSOLESHOOTING2D));
+    wcex.style          = CS_HREDRAW | CS_VREDRAW; //윈도우 스타일
+     //CS_HREDRAW : 수평 크기 변경시 전체를 다시 그린다.
+	 //CS_VREDRAW : 수직 크기 변경시 전체를 다시 그린다.
+	wcex.lpfnWndProc = WndProc; //윈도우 프로시저 함수 포인터
+    wcex.cbClsExtra     = 0; //클래스별 추가 메모리 바이트 수
+	//윈도우 클래스당 추가로 할당할 메모리의 바이트 수를 지정합니다.
+	wcex.cbWndExtra = 0; //윈도우별 추가 메모리 바이트 수
+    wcex.hInstance      = hInstance; //윈도우가 속한 인스턴스 핸들
+	//인스턴스 핸들은 프로그램이 메모리에 적재될 때 운영체제가 부여하는 고유한 값입니다.
+    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_CONSOLESHOOTING2D));  
+	//윈도우 아이콘 핸들 (LoadIcon함수로 아이콘 리소스를 로드)
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
+	//윈도우 커서 핸들 (LoadCursor함수로 커서 리소스를 로드)
     wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_CONSOLESHOOTING2D);
-    wcex.lpszClassName  = szWindowClass;
-    wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+	//윈도우 배경 브러시 핸들 (배경색 지정)
+    wcex.lpszMenuName = nullptr; //메뉴는 날림.
+    //wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_CONSOLESHOOTING2D);
+	//윈도우 메뉴 이름 (메뉴 리소스 이름)
+    wcex.lpszClassName  = szWindowClass; //윈도우 클래스 이름
+	//CreateWindow, CreateWindowEx 함수에서 이 이름으로 윈도우 생성
+    wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL)); 
+    //작은 아이콘 핸들 (LoadIcon함수로 아이콘 리소스를 로드)
+	 //작은 아이콘은 작업 표시줄과 창의 왼쪽 위 모서리에 표시됩니다.
 
     return RegisterClassExW(&wcex);
 }
@@ -98,16 +119,19 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
+   //실제 윈도우 생성
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr); 
+   //CreateWindowW함수
+   //윈도우 클래스 이름, 윈도우 타이틀, 윈도우 스타일, x좌표, y좌표, 너비, 높이, 부모 윈도우 핸들, 메뉴 핸들, 인스턴스 핸들, 추가 매개변수
 
    if (!hWnd)
    {
       return FALSE;
    }
 
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
+   ShowWindow(hWnd, nCmdShow); //윈도우를 화면에 표시
+   UpdateWindow(hWnd); //윈도우의 클라이언트 영역을 업데이트
 
    return TRUE;
 }
@@ -126,7 +150,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
-    case WM_COMMAND:
+	case WM_COMMAND: // 메뉴, 버튼, 기타 컨트롤에서 전송된 명령 (잘 안씀)
         {
             int wmId = LOWORD(wParam);
             // 메뉴 선택을 구문 분석합니다:
@@ -143,7 +167,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
-    case WM_PAINT:
+	case WM_PAINT: //윈도우의 클라이언트 영역을 그려야 할 때 (화면 갱신, 창 크기 변경 등)
         {
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
@@ -151,7 +175,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             EndPaint(hWnd, &ps);
         }
         break;
-    case WM_DESTROY:
+	case WM_DESTROY: //윈도우가 파괴될 때 (종료)
         PostQuitMessage(0);
         break;
     default:
