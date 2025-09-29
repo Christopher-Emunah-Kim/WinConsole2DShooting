@@ -2,13 +2,6 @@
 //
 
 #include "pch.h"
-#include "framework.h"
-#include "ConsoleShooting2D.h"
-
-//메모리 릭 체크
-#define _CRTDBG_MAP_ALLOC //CRT의 메모리할당함수(malloc, calloc, realloc, free)를 디버그 버전으로 매핑
-#define new new(_NORMAL_BLOCK, __FILE__, __LINE__) //new연산자를 디버그용으로 재정의. 누수된 메몰블록의 파일명, 라인번호까지 출력
-#include <crtdbg.h> //C 런타임 디버그 헤더
 
 #define MAX_LOADSTRING 100
 
@@ -16,6 +9,22 @@
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
+
+#define KHS_USE_PACKMAN 1
+#include "Objects/PackMan.h"
+
+#if KHS_USE_PACKMAN
+#ifndef KHS_PACKMAN
+#define KHS_PACKMAN
+#endif
+#endif
+
+
+#ifdef KHS_PACKMAN
+////250929 KHS PackMan 객체 생성
+PackMan k_packman(100, 100, 100, 100, 20, 30.0f, 300.0f); //시작x좌표, 시작y좌표, 너비, 높이, 속도, 시작각도, 호의각도
+
+#endif
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -145,7 +154,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    //실제 윈도우 생성
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME,  //윈도우 스타일 (최대화 버튼 제거 연산, 테두리 크기 변경 제거 연산) 
        200, 100, //시작좌표(스크린 좌표계)
-	   1280, 720, //윈도우 크기(너비, 높이)
+	   WINDOW_WIDTH, WINDOW_HEIGHT, //윈도우 크기(너비, 높이)
        nullptr, nullptr, hInstance, nullptr);
 
   /* HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
@@ -226,8 +235,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			graphicInstance.DrawPolygon(&blackPen, housePoints, 5); //다각형 채우기 (브러시, 점 배열, 점 개수)
 
             //Packman 모양 노란색 그리기 위쪽에
-			Gdiplus::SolidBrush  yellowBrush(Gdiplus::Color(255, 255, 255, 0)); //노란색 브러시 객체 생성 (불투명도, R, G, B)
-			graphicInstance.FillPie(&yellowBrush, 400, 200, 200, 200, 30, 300); //타원 채우기 (브러시, x좌표, y좌표, 너비, 높이, 시작각도, 호의 각도)
+			//Gdiplus::SolidBrush  yellowBrush(Gdiplus::Color(255, 255, 255, 0)); //노란색 브러시 객체 생성 (불투명도, R, G, B)
+			//graphicInstance.FillPie(&yellowBrush, 400, 200, 200, 200, 30, 300); //타원 채우기 (브러시, x좌표, y좌표, 너비, 높이, 시작각도, 호의 각도)
+
+#ifdef KHS_PACKMAN
+			k_packman.Draw(graphicInstance); //PackMan 그리기
+#endif
 
             EndPaint(hWnd, &ps);
         }
@@ -238,22 +251,34 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
 		case VK_LEFT: //왼쪽 방향키
 			OutputDebugStringW(L"Left Key Pressed\n");
+#ifdef KHS_PACKMAN
+			k_packman.MoveLeft(); //PackMan 왼쪽 이동
+#endif
 			InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
             break;
 		case VK_RIGHT: //오른쪽 방향키
 			OutputDebugStringW(L"Right Key Pressed\n");
+#ifdef KHS_PACKMAN
+			k_packman.MoveRight(); //PackMan 오른쪽 이동
+#endif
             InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
 			break;
 		case VK_UP: //위쪽 방향키
 			OutputDebugStringW(L"Up Key Pressed\n");
+#ifdef KHS_PACKMAN
+			k_packman.MoveUp(); //PackMan 위쪽 이동
+#endif
             InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
 			break;
 		case VK_DOWN: //아래쪽 방향키
 			OutputDebugStringW(L"Down Key Pressed\n");
+#ifdef KHS_PACKMAN
+			k_packman.MoveDown(); //PackMan 아래쪽 이동
+#endif
             InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
 			break;
 		case VK_SPACE: //스페이스바
-			OutputDebugStringW(L"Space Key Pressed\n");
+            OutputDebugStringW(L"Space Key Pressed\n");
             InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
 			break;
         case VK_ESCAPE: //ESC키

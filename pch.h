@@ -8,6 +8,13 @@
 #define PCH_H
 
 // 여기에 미리 컴파일하려는 헤더 추가
+#include "Common.h"
+#include "Resource.h"
 #include "framework.h"
+
+//메모리 릭 체크
+#include <crtdbg.h> //C 런타임 디버그 헤더
+#define _CRTDBG_MAP_ALLOC //CRT의 메모리할당함수(malloc, calloc, realloc, free)를 디버그 버전으로 매핑
+#define new new(_NORMAL_BLOCK, __FILE__, __LINE__) //new연산자를 디버그용으로 재정의. 누수된 메몰블록의 파일명, 라인번호까지 출력
 
 #endif //PCH_H
