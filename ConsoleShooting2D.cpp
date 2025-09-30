@@ -30,6 +30,11 @@ PackMan* k_packman = nullptr;
 Gdiplus::Bitmap* g_backBuffer = nullptr; //백버퍼용 GDI+ 비트맵 객체 포인터
 Gdiplus::Graphics* g_backGraphics = nullptr; //백버퍼용 GDI+ 그래픽 객체 포인터
 
+//Player Image
+Gdiplus::Bitmap* g_playerImage = nullptr;
+constexpr int playerImageSize = 64;
+
+
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -222,6 +227,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             MessageBox(hWnd, L"Back Buffer Graphics Create Failed!", L"Error", MB_OK | MB_ICONERROR);
 			PostQuitMessage(0); //프로그램 종료
         }
+
+		g_playerImage = new Gdiplus::Bitmap(L"./Images\\player.png");
+        if (!g_playerImage || g_playerImage->GetLastStatus() != Gdiplus::Ok) //플레이어 이미지 로드 실패시
+        {
+			delete g_playerImage;
+            g_playerImage = nullptr;
+			MessageBox(hWnd, L"Player Image Load Failed!", L"Error", MB_OK | MB_ICONERROR);
+        }
+
     }
     break;
 	case WM_COMMAND: // 메뉴, 버튼, 기타 컨트롤에서 전송된 명령 (잘 안씀)
@@ -269,6 +283,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					g_backGraphics->FillRectangle(&blueBrush, x * 50 + 50, y * 50 + 50, 40, 40);
                 }
             }
+
+            if (g_playerImage)
+            {
+			    g_backGraphics->DrawImage(g_playerImage, 100, 300, playerImageSize, playerImageSize); //플레이어 이미지 그리기
+            }
+            else
+            {
+				g_backGraphics->FillRectangle(&redBrush, 100, 300, playerImageSize, playerImageSize); //플레이어 이미지 없으면 빨간색 사각형 그리기
+            }
+
 
 #ifdef KHS_PACKMAN
             if (k_packman)
@@ -385,6 +409,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             k_packman = nullptr;
         }
 #endif
+        if (g_playerImage)
+        {
+            delete g_playerImage;
+            g_playerImage = nullptr;
+        }
+		
         //백버퍼용 GDI+ 그래픽 객체 삭제
         if (g_backGraphics)
         {
@@ -400,6 +430,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         PostQuitMessage(0);
     }
         break;
+
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
