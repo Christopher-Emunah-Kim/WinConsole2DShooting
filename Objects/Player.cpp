@@ -88,11 +88,11 @@ void AirPlayer::LoadPlayerImage(const std::wstring& imagePath)
 		return;
 	}
 
-	if (loadedImage->GetWidth() > 0 && loadedImage->GetHeight() > 0)
+	/*if (loadedImage->GetWidth() > 0 && loadedImage->GetHeight() > 0)
 	{
 		m_width = loadedImage->GetWidth();
 		m_height = loadedImage->GetHeight();
-	}
+	}*/
 
 	m_playerImage = loadedImage;
 }

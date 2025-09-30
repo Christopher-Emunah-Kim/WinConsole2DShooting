@@ -9,6 +9,7 @@
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
+bool g_KeyStates[256] = { false }; //키 상태 저장용 전역 배열 (0~255 가상키코드)
 
 #define KHS_USE_PACKMAN 1
 #include "Objects/Player.h"
@@ -193,6 +194,39 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    return TRUE;
 }
 
+
+
+void HandlePlayerMovement()
+{
+#ifdef KHS_PACKMAN
+    if (!k_AirPlayer)
+        return;
+
+    if (g_KeyStates['A'] || g_KeyStates[VK_LEFT])
+    {
+        k_AirPlayer->MoveLeft();
+    }
+    if (g_KeyStates['D'] || g_KeyStates[VK_RIGHT])
+    {
+        k_AirPlayer->MoveRight();
+    }
+    if (g_KeyStates['W'] || g_KeyStates[VK_UP])
+    {
+        k_AirPlayer->MoveUp();
+    }
+    if (g_KeyStates['S'] || g_KeyStates[VK_DOWN])
+    {
+        k_AirPlayer->MoveDown();
+    }
+
+    if (g_KeyStates[VK_SPACE])
+    {
+        //ShootBullet();
+    }
+
+#endif
+}
+
 //
 //  함수: WndProc(HWND, UINT, WPARAM, LPARAM)
 //
@@ -267,14 +301,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			Gdiplus::Pen blackPen(Gdiplus::Color(255, 0, 0, 0), 3); //검은색 펜 객체 생성 (색상, 두께)
 			
 
-            for (int y = 0; y < 2; ++y)
-            {
-                for (int x = 0; x < 10; ++x)
-                {
-					g_backGraphics->FillRectangle(&blueBrush, x * 50 + 50, y * 50 + 50, 40, 40);
-                }
-            }
-
 #ifdef KHS_PACKMAN
             if (k_AirPlayer)
                 k_AirPlayer->Draw(*g_backGraphics); //AirPlayer 그리기
@@ -286,6 +312,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             graphicInstance.DrawImage(g_backBuffer, 0, 0); //백버퍼의 내용을 실제 윈도우에 그리기
 
             EndPaint(hWnd, &ps);
+
+            /*for (int y = 0; y < 2; ++y)
+            {
+                for (int x = 0; x < 10; ++x)
+                {
+                    g_backGraphics->FillRectangle(&blueBrush, x * 50 + 50, y * 50 + 50, 40, 40);
+                }
+            }*/
 
             //graphicInstance.FillEllipse(&redBrush, 100, 100, 200, 200); //타원 채우기 (브러시, x좌표, y좌표, 너비, 높이)
             //graphicInstance.FillRectangle(&blueBrush, 400, 100, 200, 200); //사각형 채우기 (브러시, x좌표, y좌표, 너비, 높이)
@@ -315,70 +349,49 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     break;
     case WM_KEYDOWN:
     {
-		//bool bIsInitialKeyPress = ((lParam & (1 << 30)) == 0); //키가 처음 눌렸는지 여부 (자동반복 방지)
+		g_KeyStates[wParam] = true; //눌린 키 상태를 true로 설정
 
-        //if (bIsInitialKeyPress)
-       // {
-           //gActiveKey = (UINT)wParam; //현재 눌린 키 저장
+        switch (wParam) //눌린 키의 가상키코드
+        {
+        case 'A':
+        case VK_LEFT: //왼쪽 방향키
+            OutputDebugStringW(L"Left Key Pressed\n");
+            break;
+        case 'D':
+        case VK_RIGHT: //오른쪽 방향키
+            OutputDebugStringW(L"Right Key Pressed\n");
+            break;
+        case 'W':
+        case VK_UP: //위쪽 방향키
+            OutputDebugStringW(L"Up Key Pressed\n");
+            break;
+        case 'S':
+        case VK_DOWN: //아래쪽 방향키
+            OutputDebugStringW(L"Down Key Pressed\n");
+            break;
+        case VK_SPACE: //스페이스바
+            OutputDebugStringW(L"Space Key Pressed\n");
+            break;
+        case VK_ESCAPE: //ESC키
+            DestroyWindow(hWnd); //윈도우 종료
+            break;
 
-            switch (wParam) //눌린 키의 가상키코드
-            {
-            case 'A':
-            case VK_LEFT: //왼쪽 방향키
-                OutputDebugStringW(L"Left Key Pressed\n");
-#ifdef KHS_PACKMAN
-				if (k_AirPlayer)
-                    k_AirPlayer->MoveLeft(); 
-#endif
-                InvalidateRect(hWnd, nullptr, FALSE); //윈도우 전체를 무효화(다시 그리기 요청)
-                break;
-            case 'D':
-            case VK_RIGHT: //오른쪽 방향키
-                OutputDebugStringW(L"Right Key Pressed\n");
-#ifdef KHS_PACKMAN
-                if (k_AirPlayer)
-                    k_AirPlayer->MoveRight(); 
-#endif
-                InvalidateRect(hWnd, nullptr, FALSE); //윈도우 전체를 무효화(다시 그리기 요청)
-                break;
-            case 'W':
-            case VK_UP: //위쪽 방향키
-                OutputDebugStringW(L"Up Key Pressed\n");
-#ifdef KHS_PACKMAN
-                if (k_AirPlayer)
-                    k_AirPlayer->MoveUp(); 
-#endif
-                InvalidateRect(hWnd, nullptr, FALSE); //윈도우 전체를 무효화(다시 그리기 요청)
-                break;
-            case 'S':
-            case VK_DOWN: //아래쪽 방향키
-                OutputDebugStringW(L"Down Key Pressed\n");
-#ifdef KHS_PACKMAN
-                if (k_AirPlayer)
-                    k_AirPlayer->MoveDown();
-#endif
-                InvalidateRect(hWnd, nullptr, FALSE); //윈도우 전체를 무효화(다시 그리기 요청)
-                break;
-            case VK_SPACE: //스페이스바
-                OutputDebugStringW(L"Space Key Pressed\n");
-                InvalidateRect(hWnd, nullptr, FALSE); //윈도우 전체를 무효화(다시 그리기 요청)
-                break;
-            case VK_ESCAPE: //ESC키
-                DestroyWindow(hWnd); //윈도우 종료
-                break;
+        default:
+            break;
+        }
 
-            default:
-                break;
-            }
-        //}
+#ifdef KHS_PACKMAN
+        if (k_AirPlayer)
+        {
+            HandlePlayerMovement(); //플레이어 이동 처리
+            InvalidateRect(hWnd, nullptr, FALSE); //윈도우 전체를 무효화(다시 그리기 요청)
+        }
+#endif
     }
         break;
     case WM_KEYUP:
     {
-  //      if ((UINT)wParam == gActiveKey) //떼어진 키가 현재 눌린 키인지 확인
-  //      {
-  //          gActiveKey = 0; //현재 눌린 키 초기화
-		//}
+		g_KeyStates[wParam] = false; //눌린 키 상태를 false로 설정
     }
         break;
     case WM_DESTROY: //윈도우가 파괴될 때 (종료)
@@ -432,3 +445,5 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     }
     return (INT_PTR)FALSE;
 }
+
+
