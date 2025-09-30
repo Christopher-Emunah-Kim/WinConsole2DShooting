@@ -134,15 +134,19 @@
   <ItemGroup>
     <ClInclude Include="Common.h" />
     <ClInclude Include="ConsoleShooting2D.h" />
+    <ClInclude Include="Core\GameMaster.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Objects\Background.h" />
     <ClInclude Include="Objects\Player.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="Service\ScreenService.h" />
+    <ClInclude Include="Service\TimeService.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleShooting2D.cpp" />
+    <ClCompile Include="Core\GameMaster.cpp" />
     <ClCompile Include="Objects\Background.cpp" />
     <ClCompile Include="Objects\Player.cpp" />
     <ClCompile Include="pch.cpp">
@@ -151,6 +155,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Service\ScreenService.cpp" />
+    <ClCompile Include="Service\TimeService.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ConsoleShooting2D.rc" />

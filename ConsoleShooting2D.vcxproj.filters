@@ -39,6 +39,15 @@
     <ClInclude Include="Objects\Background.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Service\TimeService.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Service\ScreenService.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\GameMaster.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleShooting2D.cpp">
@@ -51,6 +60,15 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Objects\Background.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Service\TimeService.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Service\ScreenService.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\GameMaster.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

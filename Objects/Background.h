@@ -13,7 +13,7 @@ private:
 	void LoadBackgroundImage(const std::wstring& imagePath);
 public:
 	void Render(Gdiplus::Graphics& graphics);
-	void Update();
+	void Update(double deltaSeconds);
 
 private:
 	int m_posX;
@@ -21,5 +21,6 @@ private:
 	int m_width;
 	int m_height;
 	Gdiplus::Bitmap* m_backgroundImage = nullptr;
+	double m_scrollAccumulator = 0.0;
 };
 

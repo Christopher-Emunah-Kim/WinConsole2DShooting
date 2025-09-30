@@ -48,12 +48,25 @@ void Background::Render(Gdiplus::Graphics& graphics)
 	}
 }
 
-void Background::Update()
+void Background::Update(double deltaSeconds)
 {
-	//시간마다 배경이 아래로 움직임
-	m_posY += 1;
+	constexpr double SCROLL_SPEED = TARGET_FPS;
 
-	//배경이 화면을 벗어나면 다시 위에서 시작
+	m_scrollAccumulator += deltaSeconds * SCROLL_SPEED; //스크롤 속도 조절
+
+	const int scrollPixels = static_cast<int>(m_scrollAccumulator);
+
+	if (scrollPixels <= 0)
+	{
+		return;
+	}
+
+	m_scrollAccumulator -= scrollPixels;
+
+	m_posY += scrollPixels;
+
 	if (m_posY >= m_height)
-		m_posY = 0;
+	{
+		m_posY %= m_height;
+	}
 }

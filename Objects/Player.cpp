@@ -5,10 +5,9 @@
 
 
 AirPlayer::AirPlayer(const std::wstring& imagePath)
-	: m_posX(0), m_posY(0), m_width(0), m_height(0), m_speed(0), m_playerImage(nullptr)
+	: m_posX(0.0), m_posY(0.0), m_width(0), m_height(0), m_speed(PLAYER_DEFAULT_SPEED), m_playerImage(nullptr)
 {
 	m_keyStates.clear();
-	m_speed = PLAYER_DEFAULT_SPEED;
 
 	LoadPlayerImage(imagePath);
 	ResetStartPosition();
@@ -29,7 +28,7 @@ void AirPlayer::Render(Gdiplus::Graphics& graphics)
 {
 	if (m_playerImage)
 	{
-		graphics.DrawImage(m_playerImage, m_posX, m_posY, m_width, m_height);
+		graphics.DrawImage(m_playerImage, static_cast<int>(m_posX), static_cast<int>(m_posY), m_width, m_height);
 	}
 	else
 	{
@@ -38,26 +37,31 @@ void AirPlayer::Render(Gdiplus::Graphics& graphics)
 	}
 }
 
-void AirPlayer::Update()
+void AirPlayer::Update(double deltaSeconds)
 {
+	if(deltaSeconds <= 0.0)
+		return;
+
+	const double moveDistance = m_speed * deltaSeconds;
+
 	if (m_keyStates['A'] || m_keyStates[VK_LEFT])
 	{
-		MoveLeft();
+		MoveLeft(moveDistance);
 	}
 
 	if (m_keyStates['D'] || m_keyStates[VK_RIGHT])
 	{
-		MoveRight();
+		MoveRight(moveDistance);
 	}
 
 	if (m_keyStates['W'] || m_keyStates[VK_UP])
 	{
-		MoveUp();
+		MoveUp(moveDistance);
 	}
 
 	if (m_keyStates['S'] || m_keyStates[VK_DOWN])
 	{
-		MoveDown();
+		MoveDown(moveDistance);
 	}
 }
 
@@ -82,39 +86,40 @@ bool AirPlayer::HandleInput(WPARAM wParam, bool isKeyDown)
 	return false;
 }
 
-void AirPlayer::MoveLeft()
+void AirPlayer::MoveLeft(double distance)
 {
-	m_posX -= m_speed;
+	m_posX -= distance;
 
 	//왼쪽 테두리에 도달하면 오른쪽에서 재등장
-	if (m_posX < 0)
+	if (m_posX < 0.0)
 	{
 		m_posX = WINDOW_WIDTH - m_width;
 	}
 }
 
-void AirPlayer::MoveRight()
+void AirPlayer::MoveRight(double distance)
 {
-	m_posX += m_speed;
+	m_posX += distance;
 
 	//벽을 넘어가면 다시 왼쪽에서 시작
 	if (m_posX + m_width > WINDOW_WIDTH)
 	{
-		m_posX = 0;
+		m_posX = 0.0;
 	}
 }
 
-void AirPlayer::MoveUp()
+void AirPlayer::MoveUp(double distance)
 {
-	m_posY -= m_speed;
+	m_posY -= distance;
 
-	if (m_posY < 0)
-		m_posY = 0;
+	if (m_posY < 0.0)
+		m_posY = 0.0;
 }
 
-void AirPlayer::MoveDown()
+void AirPlayer::MoveDown(double distance)
 {
-	m_posY += m_speed;
+	m_posY += distance;
+
 	if (m_posY + m_height > WINDOW_HEIGHT)
 		m_posY = WINDOW_HEIGHT - m_height;
 
@@ -123,7 +128,7 @@ void AirPlayer::MoveDown()
 void AirPlayer::ResetStartPosition()
 {
 	m_posX = (WINDOW_WIDTH - m_width) / 2;
-	m_posY = (WINDOW_HEIGHT - m_height) / 2 + 150;
+	m_posY = (WINDOW_HEIGHT - m_height) / 2 + 150.0;
 }
 
 void AirPlayer::LoadPlayerImage(const std::wstring& imagePath)
