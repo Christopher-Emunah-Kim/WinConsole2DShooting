@@ -5,6 +5,7 @@
 void TimeService::Init()
 {
 	m_prevTimePoint = steady_clock::now();
+	m_lastDeltaSeconds = 0.0f;
 }
 
 bool TimeService::CanUpdate()
@@ -19,6 +20,7 @@ bool TimeService::CanUpdate()
 	}
 
 	m_prevTimePoint = current;
+	m_lastDeltaSeconds = delta.count();
 
 	return true;
 }

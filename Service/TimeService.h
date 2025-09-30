@@ -13,8 +13,11 @@ class TimeService
 public:
 	void Init();
 	bool CanUpdate();
+	
+	float GetDeltaSeconds() const { return m_lastDeltaSeconds; }
 
 private:
 	TimePoint m_prevTimePoint{};
+	float m_lastDeltaSeconds = 0.0f;
 };
 

@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "../Common.h"
 #include "Background.h"
+#include "../Core/GameMaster.h"
 
 
 AirPlayer::AirPlayer(const std::wstring& imagePath)
@@ -21,8 +22,6 @@ AirPlayer::~AirPlayer()
 		m_playerImage = nullptr;
 	}
 }
-
-
 
 void AirPlayer::Render(Gdiplus::Graphics& graphics)
 {

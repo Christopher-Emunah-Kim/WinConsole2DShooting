@@ -12,3 +12,7 @@
 #include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
+
+
+//추가필요헤더
+#include <memory>

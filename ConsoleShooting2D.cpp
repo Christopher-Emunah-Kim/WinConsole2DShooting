@@ -2,8 +2,6 @@
 //
 
 #include "pch.h"
-#include "Objects/Player.h"
-#include "Objects/Background.h"
 #include "Core/GameMaster.h"
 
 #define MAX_LOADSTRING 100
@@ -19,9 +17,7 @@ Gdiplus::Graphics* g_backGraphics = nullptr; //백버퍼용 GDI+ 그래픽 객�
 
 ////250929 KHS PackMan 객체 포인터 생성
 ////250930 Player 클래스로 변경
-AirPlayer* k_AirPlayer = nullptr;
-Background* k_Background = nullptr;
-GameMaster* k_GameMaster = nullptr;
+std::unique_ptr<GameMaster> k_GameMaster = nullptr; //게임 마스터 객체 포인터
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -74,7 +70,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //IN
     MSG msg;
 	// MSG : 윈도우 메시지 구조체
 
-	k_GameMaster = new GameMaster();
+	k_GameMaster = std::make_unique<GameMaster>();
     if (k_GameMaster)
     {
         k_GameMaster->Initialize();
@@ -96,22 +92,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //IN
         }
        
         //게임 로직 및 렌더링
-        if (!g_backBuffer || !g_backGraphics)
+        if (!g_backBuffer || !g_backGraphics || !k_GameMaster)
 			continue;
 
-		k_GameMaster->Tick(); //게임 로직 업데이트
-
-		InvalidateRect(nullptr, nullptr, FALSE); //전체 화면 갱신 요청
+		k_GameMaster->Tick(); 
     }
-
-  //  while (GetMessage(&msg, nullptr, 0, 0))
-  //  {
-		//if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) //단축키 메시지인지 확인
-  //      {
-		//	TranslateMessage(&msg); //키보드 메시지를 변환 (가상키코드를 문자메시지로 변환)
-		//	DispatchMessage(&msg); //메시지를 해당 윈도우 프로시저로 전달
-  //      }
-  //  }
 
 
 	//GDI+ 종료
@@ -200,20 +185,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
       return FALSE;
    }
 
-
-   if (!k_AirPlayer)
-   {
-	   std::wstring imagePath = L"./Images\\player.png";
-       k_AirPlayer = new AirPlayer(imagePath); //AirPlayer 객체 생성
-   }
-
-   if(!k_Background)
-   {
-       std::wstring bgImagePath = L"./Images\\backGround_1.png";
-       k_Background = new Background(WINDOW_WIDTH, WINDOW_HEIGHT, bgImagePath); //Background 객체 생성
-   }
-   
-
    ShowWindow(hWnd, nCmdShow); //윈도우를 화면에 표시
    UpdateWindow(hWnd); //윈도우의 클라이언트 영역을 업데이트
 
@@ -255,6 +226,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             MessageBox(hWnd, L"Back Buffer Graphics Create Failed!", L"Error", MB_OK | MB_ICONERROR);
 			PostQuitMessage(0); //프로그램 종료
         }
+
+        if (k_GameMaster)
+        {
+			k_GameMaster->SetUpWindow(hWnd);
+			k_GameMaster->SetRenderTargets(&g_backBuffer, &g_backGraphics);
+        }
     }
     break;
 	case WM_COMMAND: // 메뉴, 버튼, 기타 컨트롤에서 전송된 명령 (잘 안씀)
@@ -280,66 +257,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
 
+            if (k_GameMaster)
+            {
+				k_GameMaster->Render(); //게임 마스터 렌더링
+				k_GameMaster->Present(hdc); //게임 마스터 프리젠트
+            }
+
             if (!g_backGraphics)
             {
                 EndPaint(hWnd, &ps);
 				break;
             }
 
-            g_backGraphics->Clear(Gdiplus::Color(255, 255, 255, 255)); //백버퍼를 흰색으로 지우기
-
-			Gdiplus::SolidBrush  redBrush(Gdiplus::Color(255, 255, 0, 0)); //붉은색 브러시 객체 생성 (불투명도, R, G, B)
-			Gdiplus::SolidBrush  blueBrush(Gdiplus::Color(255, 0, 0, 255)); //파란색 브러시 객체 생성 (불투명도, R, G, B)
-			Gdiplus::SolidBrush  yellowBrush(Gdiplus::Color(255, 255, 255, 0)); //노란색 브러시 객체 생성 (불투명도, R, G, B)
-			Gdiplus::Pen greenPen(Gdiplus::Color(255, 0, 255, 0), 5); //초록색 펜 객체 생성 (색상, 두께)
-			Gdiplus::Pen blackPen(Gdiplus::Color(255, 0, 0, 0), 3); //검은색 펜 객체 생성 (색상, 두께)
-			
-
-            if (k_Background)
-            {
-                k_Background->Render(*g_backGraphics);
-            }
-
-            if (k_AirPlayer)
-            {
-				k_AirPlayer->Update(); //AirPlayer 상태 업데이트
-                k_AirPlayer->Render(*g_backGraphics); //AirPlayer 그리기
-            }
-
-
-            Gdiplus::Graphics graphicInstance(hdc); //GDI+ 그래픽 객체 생성
-
-            graphicInstance.DrawImage(g_backBuffer, 0, 0); //백버퍼의 내용을 실제 윈도우에 그리기
-
             EndPaint(hWnd, &ps);
-
-            /*for (int y = 0; y < 2; ++y)
-            {
-                for (int x = 0; x < 10; ++x)
-                {
-                    g_backGraphics->FillRectangle(&blueBrush, x * 50 + 50, y * 50 + 50, 40, 40);
-                }
-            }*/
-
-            //graphicInstance.FillEllipse(&redBrush, 100, 100, 200, 200); //타원 채우기 (브러시, x좌표, y좌표, 너비, 높이)
-            //graphicInstance.FillRectangle(&blueBrush, 400, 100, 200, 200); //사각형 채우기 (브러시, x좌표, y좌표, 너비, 높이)
-			//graphicInstance.DrawLine(&greenPen, 700, 100, 900, 300);
-			//Gdiplus::Point points[4] = { Gdiplus::Point(1000,100), Gdiplus::Point(1200,100), Gdiplus::Point(1100,300), Gdiplus::Point(900,300) };
-			//graphicInstance.FillPolygon(&blueBrush, points, 4); //다각형 그리기 (펜, 점 배열, 점 개수)
-
-   //         Gdiplus::Point housePoints[5] = {
-   //             Gdiplus::Point(100, 500), //왼쪽 아래
-   //             Gdiplus::Point(300, 500), //오른쪽 아래
-   //             Gdiplus::Point(300, 300), //오른쪽 위
-   //             Gdiplus::Point(200, 200), //꼭대기
-   //             Gdiplus::Point(100, 300)  //왼쪽 위
-   //         }; //집모양그리기
-            
-			//graphicInstance.DrawPolygon(&blackPen, housePoints, 5); //다각형 채우기 (브러시, 점 배열, 점 개수)
-
-            //Packman 모양 노란색 그리기 위쪽에
-			//graphicInstance.FillPie(&yellowBrush, 400, 200, 200, 200, 30, 300); //타원 채우기 (브러시, x좌표, y좌표, 너비, 높이, 시작각도, 호의 각도)
-
         }
         break;
     case WM_ERASEBKGND: //윈도우 배경을 지울 때 (WM_PAINT 메시지 전에 발생, 배경을 지우지 않도록 처리)
@@ -378,26 +308,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
         }
 
-        if (k_AirPlayer->HandleInput(wParam, true))
+        if(k_GameMaster && k_GameMaster->HandleInput(wParam, true))
         {
-			InvalidateRect(hWnd, nullptr, FALSE); //윈도우 전체 영역을 무효화하여 다시 그리기
-        }
+			//InvalidateRect(hWnd, nullptr, FALSE); //화면 갱신 요청
+		}
     }
         break;
     case WM_KEYUP:
     {
-        if (k_AirPlayer->HandleInput(wParam, false))
+        if (k_GameMaster && k_GameMaster->HandleInput(wParam, false))
         {
-            InvalidateRect(hWnd, nullptr, FALSE); // 키를 뗄 때도 화면을 갱신
         }
     }
         break;
     case WM_DESTROY: //윈도우가 파괴될 때 (종료)
     {
-        if (k_AirPlayer)
+        if (k_GameMaster)
         {
-            delete k_AirPlayer; //AirPlayer 객체 삭제
-            k_AirPlayer = nullptr;
+			k_GameMaster->Release();
+			k_GameMaster.reset();
         }
 
         //백버퍼용 GDI+ 그래픽 객체 삭제
