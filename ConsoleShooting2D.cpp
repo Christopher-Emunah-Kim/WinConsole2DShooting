@@ -12,6 +12,7 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름�
 
 #define KHS_USE_PACKMAN 1
 #include "Objects/Player.h"
+#include "Objects/Background.h"
 
 #if KHS_USE_PACKMAN
 #ifndef KHS_PACKMAN
@@ -27,6 +28,8 @@ Gdiplus::Graphics* g_backGraphics = nullptr; //백버퍼용 GDI+ 그래픽 객�
 ////250929 KHS PackMan 객체 포인터 생성
 ////250930 Player 클래스로 변경
 AirPlayer* k_AirPlayer = nullptr;
+Background* k_Background = nullptr;
+
 #endif
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
@@ -94,9 +97,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //IN
                 DispatchMessage(&msg); //메시지를 해당 윈도우 프로시저로 전달
             }
         }
-        else
+       
+        //게임 로직 및 렌더링
+        if (!g_backBuffer || !g_backGraphics)
+            continue;
+
+        if (k_Background)
         {
-            //게임 로직 및 렌더링
+            k_Background->Update();
         }
     }
 
@@ -202,7 +210,14 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	   std::wstring imagePath = L"./Images\\player.png";
        k_AirPlayer = new AirPlayer(imagePath); //AirPlayer 객체 생성
    }
+
+   if(!k_Background)
+   {
+       std::wstring bgImagePath = L"./Images\\backGround_1.png";
+       k_Background = new Background(WINDOW_WIDTH, WINDOW_HEIGHT, bgImagePath); //Background 객체 생성
+   }
 #endif
+   
 
    ShowWindow(hWnd, nCmdShow); //윈도우를 화면에 표시
    UpdateWindow(hWnd); //윈도우의 클라이언트 영역을 업데이트
@@ -286,12 +301,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			
 
 #ifdef KHS_PACKMAN
+            if (k_Background)
+            {
+                k_Background->Render(*g_backGraphics);
+            }
+
             if (k_AirPlayer)
             {
 				k_AirPlayer->Update(); //AirPlayer 상태 업데이트
                 k_AirPlayer->Render(*g_backGraphics); //AirPlayer 그리기
             }
-
 #endif
 
 

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Player.h"
 #include "../Common.h"
+#include "Background.h"
 
 
 AirPlayer::AirPlayer(const std::wstring& imagePath)
@@ -21,6 +22,8 @@ AirPlayer::~AirPlayer()
 		m_playerImage = nullptr;
 	}
 }
+
+
 
 void AirPlayer::Render(Gdiplus::Graphics& graphics)
 {
@@ -83,18 +86,22 @@ void AirPlayer::MoveLeft()
 {
 	m_posX -= m_speed;
 
-	if (m_posX < 0) 
-		m_posX = 0;
-
+	//왼쪽 테두리에 도달하면 오른쪽에서 재등장
+	if (m_posX < 0)
+	{
+		m_posX = WINDOW_WIDTH - m_width;
+	}
 }
 
 void AirPlayer::MoveRight()
 {
 	m_posX += m_speed;
 
+	//벽을 넘어가면 다시 왼쪽에서 시작
 	if (m_posX + m_width > WINDOW_WIDTH)
-		m_posX = WINDOW_WIDTH - m_width;
-
+	{
+		m_posX = 0;
+	}
 }
 
 void AirPlayer::MoveUp()
