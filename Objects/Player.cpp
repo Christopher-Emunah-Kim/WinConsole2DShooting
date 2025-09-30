@@ -6,6 +6,8 @@
 AirPlayer::AirPlayer(int w, int h, int spd, const std::wstring& imagePath)
 	: m_posX(0), m_posY(0), m_width(w), m_height(h), m_speed(spd), m_playerImage(nullptr)
 {
+	m_keyStates.clear();
+
 	LoadPlayerImage(imagePath);
 	ResetStartPosition();
 }
@@ -19,7 +21,7 @@ AirPlayer::~AirPlayer()
 	}
 }
 
-void AirPlayer::Draw(Gdiplus::Graphics& graphics)
+void AirPlayer::Render(Gdiplus::Graphics& graphics)
 {
 	if (m_playerImage)
 	{
@@ -30,6 +32,50 @@ void AirPlayer::Draw(Gdiplus::Graphics& graphics)
 		Gdiplus::SolidBrush  yellowBrush(Gdiplus::Color(255, 255, 255, 0)); // 이미지 미사용 시 팩맨 모양 유지
 		graphics.FillPie(&yellowBrush, m_posX, m_posY, m_width, m_height, 210, 300);
 	}
+}
+
+void AirPlayer::Update()
+{
+	if (m_keyStates['A'] || m_keyStates[VK_LEFT])
+	{
+		MoveLeft();
+	}
+
+	if (m_keyStates['D'] || m_keyStates[VK_RIGHT])
+	{
+		MoveRight();
+	}
+
+	if (m_keyStates['W'] || m_keyStates[VK_UP])
+	{
+		MoveUp();
+	}
+
+	if (m_keyStates['S'] || m_keyStates[VK_DOWN])
+	{
+		MoveDown();
+	}
+}
+
+bool AirPlayer::HandleInput(WPARAM wParam, bool isKeyDown)
+{
+	switch (wParam)
+	{
+	case 'A':
+	case VK_LEFT:
+	case 'D':
+	case VK_RIGHT:
+	case 'W':
+	case VK_UP:
+	case 'S':
+	case VK_DOWN:
+		m_keyStates[wParam] = isKeyDown;
+		return true;
+	default:
+		break;
+	}
+
+	return false;
 }
 
 void AirPlayer::MoveLeft()

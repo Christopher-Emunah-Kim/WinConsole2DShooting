@@ -9,7 +9,6 @@
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
-bool g_KeyStates[256] = { false }; //키 상태 저장용 전역 배열 (0~255 가상키코드)
 
 #define KHS_USE_PACKMAN 1
 #include "Objects/Player.h"
@@ -195,38 +194,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 }
 
 
-
-void HandlePlayerMovement()
-{
-#ifdef KHS_PACKMAN
-    if (!k_AirPlayer)
-        return;
-
-    if (g_KeyStates['A'] || g_KeyStates[VK_LEFT])
-    {
-        k_AirPlayer->MoveLeft();
-    }
-    if (g_KeyStates['D'] || g_KeyStates[VK_RIGHT])
-    {
-        k_AirPlayer->MoveRight();
-    }
-    if (g_KeyStates['W'] || g_KeyStates[VK_UP])
-    {
-        k_AirPlayer->MoveUp();
-    }
-    if (g_KeyStates['S'] || g_KeyStates[VK_DOWN])
-    {
-        k_AirPlayer->MoveDown();
-    }
-
-    if (g_KeyStates[VK_SPACE])
-    {
-        //ShootBullet();
-    }
-
-#endif
-}
-
 //
 //  함수: WndProc(HWND, UINT, WPARAM, LPARAM)
 //
@@ -303,7 +270,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 #ifdef KHS_PACKMAN
             if (k_AirPlayer)
-                k_AirPlayer->Draw(*g_backGraphics); //AirPlayer 그리기
+            {
+				k_AirPlayer->Update(); //AirPlayer 상태 업데이트
+                k_AirPlayer->Render(*g_backGraphics); //AirPlayer 그리기
+            }
+
 #endif
 
 
@@ -349,8 +320,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     break;
     case WM_KEYDOWN:
     {
-		g_KeyStates[wParam] = true; //눌린 키 상태를 true로 설정
-
         switch (wParam) //눌린 키의 가상키코드
         {
         case 'A':
@@ -381,17 +350,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
 
 #ifdef KHS_PACKMAN
-        if (k_AirPlayer)
+        if (k_AirPlayer->HandleInput(wParam, true))
         {
-            HandlePlayerMovement(); //플레이어 이동 처리
-            InvalidateRect(hWnd, nullptr, FALSE); //윈도우 전체를 무효화(다시 그리기 요청)
+			InvalidateRect(hWnd, nullptr, FALSE); //윈도우 전체 영역을 무효화하여 다시 그리기
         }
 #endif
     }
         break;
     case WM_KEYUP:
     {
-		g_KeyStates[wParam] = false; //눌린 키 상태를 false로 설정
+#ifdef KHS_PACKMAN
+        if (k_AirPlayer->HandleInput(wParam, false))
+        {
+            InvalidateRect(hWnd, nullptr, FALSE); // 키를 뗄 때도 화면을 갱신
+        }
+#endif
     }
         break;
     case WM_DESTROY: //윈도우가 파괴될 때 (종료)

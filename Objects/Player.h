@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <unordered_map>
 
 namespace Gdiplus
 {
@@ -15,18 +16,18 @@ public:
 	~AirPlayer();
 
 private:
-
-
-public:
-	void Draw(Gdiplus::Graphics& graphics);
+	void ResetStartPosition();
+	void LoadPlayerImage(const std::wstring& imagePath);
 
 	void MoveLeft();
 	void MoveRight();
 	void MoveUp();
 	void MoveDown();
 
-	void ResetStartPosition();
-	void LoadPlayerImage(const std::wstring& imagePath);
+public:
+	void Render(Gdiplus::Graphics& graphics);
+	void Update();
+	bool HandleInput(WPARAM wParam, bool isKeyDown);
 
 	inline int GetX() const { return m_posX; }
 	inline int GetY() const { return m_posY; }
@@ -39,5 +40,6 @@ private:
 	int m_height;
 	int m_speed;
 	Gdiplus::Bitmap* m_playerImage = nullptr;
+	std::unordered_map<WPARAM, bool> m_keyStates; //키 상태 저장용 맵
 };
 
