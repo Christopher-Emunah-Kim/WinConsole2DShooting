@@ -151,10 +151,17 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    //윈도우콘솔 타이틀 수정
    SetConsoleTitle(L"Win Console Shooting 2D");
 
+   //클라이언트 영역 크기 조정
+   RECT myRect = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT }; //클라이언트 영역 크기 설정
+   AdjustWindowRectEx(&myRect, WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME, FALSE, 0);
+   //윈도우 스타일 (최대화 버튼 제거 연산, 테두리 크기 변경 제거 비트 연산) 
+   //AdjustWindowRect함수 : 윈도우 스타일에 맞게 클라이언트 영역 크기를 조정
+   //myRect : 조정할 RECT 구조체 포인터
+
    //실제 윈도우 생성
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME,  //윈도우 스타일 (최대화 버튼 제거 연산, 테두리 크기 변경 제거 연산) 
-       200, 100, //시작좌표(스크린 좌표계)
-	   WINDOW_WIDTH, WINDOW_HEIGHT, //윈도우 크기(너비, 높이)
+   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME,  
+       APP_POSITION_X, APP_POSITION_Y, //시작좌표(스크린 좌표계)
+	   myRect.right - myRect.left, myRect.bottom - myRect.top, //윈도우 스타일에 맞춰 조정된 너비와 높이
        nullptr, nullptr, hInstance, nullptr);
 
   /* HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
