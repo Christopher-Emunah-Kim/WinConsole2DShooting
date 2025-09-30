@@ -11,7 +11,7 @@ WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
 #define KHS_USE_PACKMAN 1
-#include "Objects/PackMan.h"
+#include "Objects/Player.h"
 
 #if KHS_USE_PACKMAN
 #ifndef KHS_PACKMAN
@@ -19,21 +19,17 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름�
 #endif
 #endif
 
-
-#ifdef KHS_PACKMAN
-////250929 KHS PackMan 객체 포인터 생성
-PackMan* k_packman = nullptr;
-
-#endif
-
 //Back Buffer
 Gdiplus::Bitmap* g_backBuffer = nullptr; //백버퍼용 GDI+ 비트맵 객체 포인터
 Gdiplus::Graphics* g_backGraphics = nullptr; //백버퍼용 GDI+ 그래픽 객체 포인터
 
-//Player Image
-Gdiplus::Bitmap* g_playerImage = nullptr;
-constexpr int playerImageSize = 64;
-
+#ifdef KHS_PACKMAN
+////250929 KHS PackMan 객체 포인터 생성
+////250930 Player 클래스로 변경
+AirPlayer* k_AirPlayer = nullptr;
+constexpr int PLAYER_IMAGE_SIZE = 64;
+#endif
+constexpr int DEFAULT_PLAYER_IMAGE_SIZE = 64;
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -184,7 +180,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    }
 
 #ifdef KHS_PACKMAN
-   k_packman = new PackMan(100, 100, 100, 100, 20, 30.0f, 300.0f); //PackMan 객체 생성
+   if (!k_AirPlayer)
+   {
+	   std::wstring imagePath = L"./Images\\player.png";
+       k_AirPlayer = new AirPlayer(DEFAULT_PLAYER_IMAGE_SIZE, DEFAULT_PLAYER_IMAGE_SIZE, 20, imagePath); //AirPlayer 객체 생성
+   }
 #endif
 
    ShowWindow(hWnd, nCmdShow); //윈도우를 화면에 표시
@@ -227,15 +227,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             MessageBox(hWnd, L"Back Buffer Graphics Create Failed!", L"Error", MB_OK | MB_ICONERROR);
 			PostQuitMessage(0); //프로그램 종료
         }
-
-		g_playerImage = new Gdiplus::Bitmap(L"./Images\\player.png");
-        if (!g_playerImage || g_playerImage->GetLastStatus() != Gdiplus::Ok) //플레이어 이미지 로드 실패시
-        {
-			delete g_playerImage;
-            g_playerImage = nullptr;
-			MessageBox(hWnd, L"Player Image Load Failed!", L"Error", MB_OK | MB_ICONERROR);
-        }
-
     }
     break;
 	case WM_COMMAND: // 메뉴, 버튼, 기타 컨트롤에서 전송된 명령 (잘 안씀)
@@ -284,19 +275,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 }
             }
 
-            if (g_playerImage)
-            {
-			    g_backGraphics->DrawImage(g_playerImage, 100, 300, playerImageSize, playerImageSize); //플레이어 이미지 그리기
-            }
-            else
-            {
-				g_backGraphics->FillRectangle(&redBrush, 100, 300, playerImageSize, playerImageSize); //플레이어 이미지 없으면 빨간색 사각형 그리기
-            }
-
-
 #ifdef KHS_PACKMAN
-            if (k_packman)
-                k_packman->Draw(*g_backGraphics); //PackMan 그리기
+            if (k_AirPlayer)
+                k_AirPlayer->Draw(*g_backGraphics); //AirPlayer 그리기
 #endif
 
 
@@ -346,8 +327,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             case VK_LEFT: //왼쪽 방향키
                 OutputDebugStringW(L"Left Key Pressed\n");
 #ifdef KHS_PACKMAN
-				if (k_packman)
-                    k_packman->MoveLeft(); //PackMan 왼쪽 이동
+				if (k_AirPlayer)
+                    k_AirPlayer->MoveLeft(); 
 #endif
                 InvalidateRect(hWnd, nullptr, FALSE); //윈도우 전체를 무효화(다시 그리기 요청)
                 break;
@@ -355,8 +336,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             case VK_RIGHT: //오른쪽 방향키
                 OutputDebugStringW(L"Right Key Pressed\n");
 #ifdef KHS_PACKMAN
-                if (k_packman)
-                    k_packman->MoveRight(); //PackMan 오른쪽 이동
+                if (k_AirPlayer)
+                    k_AirPlayer->MoveRight(); 
 #endif
                 InvalidateRect(hWnd, nullptr, FALSE); //윈도우 전체를 무효화(다시 그리기 요청)
                 break;
@@ -364,8 +345,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             case VK_UP: //위쪽 방향키
                 OutputDebugStringW(L"Up Key Pressed\n");
 #ifdef KHS_PACKMAN
-                if (k_packman)
-                    k_packman->MoveUp(); //PackMan 위쪽 이동
+                if (k_AirPlayer)
+                    k_AirPlayer->MoveUp(); 
 #endif
                 InvalidateRect(hWnd, nullptr, FALSE); //윈도우 전체를 무효화(다시 그리기 요청)
                 break;
@@ -373,8 +354,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             case VK_DOWN: //아래쪽 방향키
                 OutputDebugStringW(L"Down Key Pressed\n");
 #ifdef KHS_PACKMAN
-                if (k_packman)
-                    k_packman->MoveDown(); //PackMan 아래쪽 이동
+                if (k_AirPlayer)
+                    k_AirPlayer->MoveDown();
 #endif
                 InvalidateRect(hWnd, nullptr, FALSE); //윈도우 전체를 무효화(다시 그리기 요청)
                 break;
@@ -393,28 +374,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
         break;
     case WM_KEYUP:
-  //  {
+    {
   //      if ((UINT)wParam == gActiveKey) //떼어진 키가 현재 눌린 키인지 확인
   //      {
   //          gActiveKey = 0; //현재 눌린 키 초기화
 		//}
-  //  }
+    }
         break;
     case WM_DESTROY: //윈도우가 파괴될 때 (종료)
     {
 #ifdef KHS_PACKMAN
-        if (k_packman)
+        if (k_AirPlayer)
         {
-            delete k_packman; //PackMan 객체 삭제
-            k_packman = nullptr;
+            delete k_AirPlayer; //AirPlayer 객체 삭제
+            k_AirPlayer = nullptr;
         }
 #endif
-        if (g_playerImage)
-        {
-            delete g_playerImage;
-            g_playerImage = nullptr;
-        }
-		
+        		
         //백버퍼용 GDI+ 그래픽 객체 삭제
         if (g_backGraphics)
         {
