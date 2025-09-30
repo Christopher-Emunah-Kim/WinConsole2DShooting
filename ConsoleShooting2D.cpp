@@ -26,6 +26,10 @@ PackMan* k_packman = nullptr;
 
 #endif
 
+//Back Buffer
+Gdiplus::Bitmap* g_backBuffer = nullptr; //백버퍼용 GDI+ 비트맵 객체 포인터
+Gdiplus::Graphics* g_backGraphics = nullptr; //백버퍼용 GDI+ 그래픽 객체 포인터
+
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -44,7 +48,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //IN
     // TODO: 여기에 코드를 입력합니다.
 
      //메모리 릭 체크
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	//CRT디버그 플래그 설정. 디버그 힙 기능활성, 메모리 릭 체크 활성화, 프로그램 종료 시 메모리 누수보고서 출력
 
 	//GDI+ 초기화
@@ -200,6 +204,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+    case WM_CREATE: //윈도우가 생성될 때
+    {
+        //백버퍼용 GDI+ 비트맵 객체 생성
+        if (g_backBuffer == nullptr)
+        {
+            g_backBuffer = new Gdiplus::Bitmap(WINDOW_WIDTH, WINDOW_HEIGHT, PixelFormat32bppARGB );
+        }
+        //백버퍼용 GDI+ 그래픽 객체 생성
+        if (g_backGraphics == nullptr && g_backBuffer != nullptr)
+        {
+            g_backGraphics = Gdiplus::Graphics::FromImage(g_backBuffer);
+		}
+    }
+    break;
 	case WM_COMMAND: // 메뉴, 버튼, 기타 컨트롤에서 전송된 명령 (잘 안씀)
         {
             int wmId = LOWORD(wParam);
