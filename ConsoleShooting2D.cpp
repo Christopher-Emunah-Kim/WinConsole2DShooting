@@ -2,6 +2,9 @@
 //
 
 #include "pch.h"
+#include "Objects/Player.h"
+#include "Objects/Background.h"
+#include "Core/GameMaster.h"
 
 #define MAX_LOADSTRING 100
 
@@ -10,27 +13,15 @@ HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
-#define KHS_USE_PACKMAN 1
-#include "Objects/Player.h"
-#include "Objects/Background.h"
-
-#if KHS_USE_PACKMAN
-#ifndef KHS_PACKMAN
-#define KHS_PACKMAN
-#endif
-#endif
-
 //Back Buffer
 Gdiplus::Bitmap* g_backBuffer = nullptr; //백버퍼용 GDI+ 비트맵 객체 포인터
 Gdiplus::Graphics* g_backGraphics = nullptr; //백버퍼용 GDI+ 그래픽 객체 포인터
 
-#ifdef KHS_PACKMAN
 ////250929 KHS PackMan 객체 포인터 생성
 ////250930 Player 클래스로 변경
 AirPlayer* k_AirPlayer = nullptr;
 Background* k_Background = nullptr;
-
-#endif
+GameMaster* k_GameMaster = nullptr;
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -83,6 +74,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //IN
     MSG msg;
 	// MSG : 윈도우 메시지 구조체
 
+	k_GameMaster = new GameMaster();
+    if (k_GameMaster)
+    {
+        k_GameMaster->Initialize();
+    }
+
 	// 기본 메시지 루프입니다: (메시지 큐에 들어온 메시지를 처리하는 반복문) (중요~!!)
     while (true)
     {
@@ -100,12 +97,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //IN
        
         //게임 로직 및 렌더링
         if (!g_backBuffer || !g_backGraphics)
-            continue;
+			continue;
 
-        if (k_Background)
-        {
-            k_Background->Update();
-        }
+		k_GameMaster->Tick(); //게임 로직 업데이트
+
+		InvalidateRect(nullptr, nullptr, FALSE); //전체 화면 갱신 요청
     }
 
   //  while (GetMessage(&msg, nullptr, 0, 0))
@@ -204,7 +200,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
       return FALSE;
    }
 
-#ifdef KHS_PACKMAN
+
    if (!k_AirPlayer)
    {
 	   std::wstring imagePath = L"./Images\\player.png";
@@ -216,7 +212,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
        std::wstring bgImagePath = L"./Images\\backGround_1.png";
        k_Background = new Background(WINDOW_WIDTH, WINDOW_HEIGHT, bgImagePath); //Background 객체 생성
    }
-#endif
    
 
    ShowWindow(hWnd, nCmdShow); //윈도우를 화면에 표시
@@ -300,7 +295,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			Gdiplus::Pen blackPen(Gdiplus::Color(255, 0, 0, 0), 3); //검은색 펜 객체 생성 (색상, 두께)
 			
 
-#ifdef KHS_PACKMAN
             if (k_Background)
             {
                 k_Background->Render(*g_backGraphics);
@@ -311,7 +305,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				k_AirPlayer->Update(); //AirPlayer 상태 업데이트
                 k_AirPlayer->Render(*g_backGraphics); //AirPlayer 그리기
             }
-#endif
 
 
             Gdiplus::Graphics graphicInstance(hdc); //GDI+ 그래픽 객체 생성
@@ -385,34 +378,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
         }
 
-#ifdef KHS_PACKMAN
         if (k_AirPlayer->HandleInput(wParam, true))
         {
 			InvalidateRect(hWnd, nullptr, FALSE); //윈도우 전체 영역을 무효화하여 다시 그리기
         }
-#endif
     }
         break;
     case WM_KEYUP:
     {
-#ifdef KHS_PACKMAN
         if (k_AirPlayer->HandleInput(wParam, false))
         {
             InvalidateRect(hWnd, nullptr, FALSE); // 키를 뗄 때도 화면을 갱신
         }
-#endif
     }
         break;
     case WM_DESTROY: //윈도우가 파괴될 때 (종료)
     {
-#ifdef KHS_PACKMAN
         if (k_AirPlayer)
         {
             delete k_AirPlayer; //AirPlayer 객체 삭제
             k_AirPlayer = nullptr;
         }
-#endif
-        		
+
         //백버퍼용 GDI+ 그래픽 객체 삭제
         if (g_backGraphics)
         {

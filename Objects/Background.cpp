@@ -3,10 +3,8 @@
 
 
 Background::Background(int windowWIdth, int windowHeight, const std::wstring& imagePath)
-	: m_posX(0), m_posY(0), m_width(windowWIdth), m_height(windowHeight), m_backgroundImage(nullptr)
+	: m_posX(0), m_posY(windowHeight), m_width(windowWIdth), m_height(windowHeight), m_backgroundImage(nullptr)
 {
-	m_posX = 0;
-	m_posY = 0;
 	LoadBackgroundImage(imagePath);
 }
 
