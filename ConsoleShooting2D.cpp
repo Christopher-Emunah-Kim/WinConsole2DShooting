@@ -216,6 +216,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             g_backGraphics = Gdiplus::Graphics::FromImage(g_backBuffer);
 		}
+        
+		if (!g_backGraphics) //백버퍼용 그래픽 객체 생성 실패시
+        {
+            MessageBox(hWnd, L"Back Buffer Graphics Create Failed!", L"Error", MB_OK | MB_ICONERROR);
+			PostQuitMessage(0); //프로그램 종료
+        }
     }
     break;
 	case WM_COMMAND: // 메뉴, 버튼, 기타 컨트롤에서 전송된 명령 (잘 안씀)
@@ -241,42 +247,67 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
 
-			Gdiplus::Graphics graphicInstance(hdc); //GDI+ 그래픽 객체 생성
+            if (!g_backGraphics)
+            {
+                EndPaint(hWnd, &ps);
+				break;
+            }
+
+            g_backGraphics->Clear(Gdiplus::Color(255, 255, 255, 255)); //백버퍼를 흰색으로 지우기
 
 			Gdiplus::SolidBrush  redBrush(Gdiplus::Color(255, 255, 0, 0)); //붉은색 브러시 객체 생성 (불투명도, R, G, B)
 			Gdiplus::SolidBrush  blueBrush(Gdiplus::Color(255, 0, 0, 255)); //파란색 브러시 객체 생성 (불투명도, R, G, B)
-			//graphicInstance.FillEllipse(&redBrush, 100, 100, 200, 200); //타원 채우기 (브러시, x좌표, y좌표, 너비, 높이)
-            //graphicInstance.FillRectangle(&blueBrush, 400, 100, 200, 200); //사각형 채우기 (브러시, x좌표, y좌표, 너비, 높이)
-
-			//Gdiplus::Pen greenPen(Gdiplus::Color(255, 0, 255, 0), 5); //초록색 펜 객체 생성 (색상, 두께)
-			//graphicInstance.DrawLine(&greenPen, 700, 100, 900, 300);
-
+			Gdiplus::SolidBrush  yellowBrush(Gdiplus::Color(255, 255, 255, 0)); //노란색 브러시 객체 생성 (불투명도, R, G, B)
+			Gdiplus::Pen greenPen(Gdiplus::Color(255, 0, 255, 0), 5); //초록색 펜 객체 생성 (색상, 두께)
 			Gdiplus::Pen blackPen(Gdiplus::Color(255, 0, 0, 0), 3); //검은색 펜 객체 생성 (색상, 두께)
+			
+
+            for (int y = 0; y < 2; ++y)
+            {
+                for (int x = 0; x < 10; ++x)
+                {
+					g_backGraphics->FillRectangle(&blueBrush, x * 50 + 50, y * 50 + 50, 40, 40);
+                }
+            }
+
+#ifdef KHS_PACKMAN
+            if (k_packman)
+                k_packman->Draw(*g_backGraphics); //PackMan 그리기
+#endif
+
+
+            Gdiplus::Graphics graphicInstance(hdc); //GDI+ 그래픽 객체 생성
+
+            graphicInstance.DrawImage(g_backBuffer, 0, 0); //백버퍼의 내용을 실제 윈도우에 그리기
+
+            EndPaint(hWnd, &ps);
+
+            //graphicInstance.FillEllipse(&redBrush, 100, 100, 200, 200); //타원 채우기 (브러시, x좌표, y좌표, 너비, 높이)
+            //graphicInstance.FillRectangle(&blueBrush, 400, 100, 200, 200); //사각형 채우기 (브러시, x좌표, y좌표, 너비, 높이)
+			//graphicInstance.DrawLine(&greenPen, 700, 100, 900, 300);
 			//Gdiplus::Point points[4] = { Gdiplus::Point(1000,100), Gdiplus::Point(1200,100), Gdiplus::Point(1100,300), Gdiplus::Point(900,300) };
 			//graphicInstance.FillPolygon(&blueBrush, points, 4); //다각형 그리기 (펜, 점 배열, 점 개수)
 
-            //집모양그리기
-            Gdiplus::Point housePoints[5] = {
-                Gdiplus::Point(100, 500), //왼쪽 아래
-                Gdiplus::Point(300, 500), //오른쪽 아래
-                Gdiplus::Point(300, 300), //오른쪽 위
-                Gdiplus::Point(200, 200), //꼭대기
-                Gdiplus::Point(100, 300)  //왼쪽 위
-            };
-			graphicInstance.DrawPolygon(&blackPen, housePoints, 5); //다각형 채우기 (브러시, 점 배열, 점 개수)
+   //         Gdiplus::Point housePoints[5] = {
+   //             Gdiplus::Point(100, 500), //왼쪽 아래
+   //             Gdiplus::Point(300, 500), //오른쪽 아래
+   //             Gdiplus::Point(300, 300), //오른쪽 위
+   //             Gdiplus::Point(200, 200), //꼭대기
+   //             Gdiplus::Point(100, 300)  //왼쪽 위
+   //         }; //집모양그리기
+            
+			//graphicInstance.DrawPolygon(&blackPen, housePoints, 5); //다각형 채우기 (브러시, 점 배열, 점 개수)
 
             //Packman 모양 노란색 그리기 위쪽에
-			//Gdiplus::SolidBrush  yellowBrush(Gdiplus::Color(255, 255, 255, 0)); //노란색 브러시 객체 생성 (불투명도, R, G, B)
 			//graphicInstance.FillPie(&yellowBrush, 400, 200, 200, 200, 30, 300); //타원 채우기 (브러시, x좌표, y좌표, 너비, 높이, 시작각도, 호의 각도)
 
-#ifdef KHS_PACKMAN
-            if(k_packman)
-    			k_packman->Draw(graphicInstance); //PackMan 그리기
-#endif
-
-            EndPaint(hWnd, &ps);
         }
         break;
+    case WM_ERASEBKGND: //윈도우 배경을 지울 때 (WM_PAINT 메시지 전에 발생, 배경을 지우지 않도록 처리)
+    {
+        return 1; //0이 아닌 값을 반환하면 배경 지우기를 하지 않음
+	}
+    break;
     case WM_KEYDOWN:
     {
 		//bool bIsInitialKeyPress = ((lParam & (1 << 30)) == 0); //키가 처음 눌렸는지 여부 (자동반복 방지)
@@ -294,7 +325,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if (k_packman)
                     k_packman->MoveLeft(); //PackMan 왼쪽 이동
 #endif
-                InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
+                InvalidateRect(hWnd, nullptr, FALSE); //윈도우 전체를 무효화(다시 그리기 요청)
                 break;
             case 'D':
             case VK_RIGHT: //오른쪽 방향키
@@ -303,7 +334,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 if (k_packman)
                     k_packman->MoveRight(); //PackMan 오른쪽 이동
 #endif
-                InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
+                InvalidateRect(hWnd, nullptr, FALSE); //윈도우 전체를 무효화(다시 그리기 요청)
                 break;
             case 'W':
             case VK_UP: //위쪽 방향키
@@ -312,7 +343,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 if (k_packman)
                     k_packman->MoveUp(); //PackMan 위쪽 이동
 #endif
-                InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
+                InvalidateRect(hWnd, nullptr, FALSE); //윈도우 전체를 무효화(다시 그리기 요청)
                 break;
             case 'S':
             case VK_DOWN: //아래쪽 방향키
@@ -321,11 +352,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 if (k_packman)
                     k_packman->MoveDown(); //PackMan 아래쪽 이동
 #endif
-                InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
+                InvalidateRect(hWnd, nullptr, FALSE); //윈도우 전체를 무효화(다시 그리기 요청)
                 break;
             case VK_SPACE: //스페이스바
                 OutputDebugStringW(L"Space Key Pressed\n");
-                InvalidateRect(hWnd, nullptr, TRUE); //윈도우 전체를 무효화(다시 그리기 요청)
+                InvalidateRect(hWnd, nullptr, FALSE); //윈도우 전체를 무효화(다시 그리기 요청)
                 break;
             case VK_ESCAPE: //ESC키
                 DestroyWindow(hWnd); //윈도우 종료
@@ -336,7 +367,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         //}
     }
-    break;
+        break;
     case WM_KEYUP:
   //  {
   //      if ((UINT)wParam == gActiveKey) //떼어진 키가 현재 눌린 키인지 확인
@@ -344,16 +375,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   //          gActiveKey = 0; //현재 눌린 키 초기화
 		//}
   //  }
-    break;
-	case WM_DESTROY: //윈도우가 파괴될 때 (종료)
+        break;
+    case WM_DESTROY: //윈도우가 파괴될 때 (종료)
+    {
 #ifdef KHS_PACKMAN
         if (k_packman)
         {
             delete k_packman; //PackMan 객체 삭제
             k_packman = nullptr;
-		}
+        }
 #endif
+        //백버퍼용 GDI+ 그래픽 객체 삭제
+        if (g_backGraphics)
+        {
+            delete g_backGraphics;
+            g_backGraphics = nullptr;
+        }
+        //백버퍼용 GDI+ 비트맵 객체 삭제
+        if (g_backBuffer)
+        {
+            delete g_backBuffer;
+            g_backBuffer = nullptr;
+        }
         PostQuitMessage(0);
+    }
         break;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
