@@ -51,6 +51,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //IN
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_CONSOLESHOOTING2D, szWindowClass, MAX_LOADSTRING);
 
+
+    k_GameMaster = std::make_unique<GameMaster>();
+    if (k_GameMaster)
+    {
+        k_GameMaster->Initialize();
+    }
+
+
 	MyRegisterClass(hInstance); //Window Class 등록 (중요~!!)
 
     // 애플리케이션 초기화를 수행합니다: (중요~!!)
@@ -69,12 +77,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //IN
 
     MSG msg;
 	// MSG : 윈도우 메시지 구조체
-
-	k_GameMaster = std::make_unique<GameMaster>();
-    if (k_GameMaster)
-    {
-        k_GameMaster->Initialize();
-    }
 
 	// 기본 메시지 루프입니다: (메시지 큐에 들어온 메시지를 처리하는 반복문) (중요~!!)
     while (true)

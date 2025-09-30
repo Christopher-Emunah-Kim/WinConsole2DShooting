@@ -3,7 +3,7 @@
 
 
 Background::Background(int windowWIdth, int windowHeight, const std::wstring& imagePath)
-	: m_posX(0), m_posY(windowHeight), m_width(windowWIdth), m_height(windowHeight), m_backgroundImage(nullptr)
+	: m_posX(0), m_posY(0), m_width(windowWIdth), m_height(windowHeight), m_backgroundImage(nullptr), m_scrollAccumulator(0.0)
 {
 	LoadBackgroundImage(imagePath);
 }
@@ -39,7 +39,17 @@ void Background::Render(Gdiplus::Graphics& graphics)
 {
 	if (m_backgroundImage)
 	{
-		graphics.DrawImage(m_backgroundImage, m_posX, m_posY, m_width, m_height);
+		const int y0 = m_posY;
+		const int y1 = m_posY - m_height;
+
+		graphics.DrawImage(m_backgroundImage, m_posX, y0, m_width, m_height);
+		graphics.DrawImage(m_backgroundImage, m_posX, y1, m_width, m_height);
+
+		if (m_height < WINDOW_HEIGHT)
+		{
+			const int y2 = m_posY + m_height;
+			graphics.DrawImage(m_backgroundImage, m_posX, y2, m_width, m_height);
+		}
 	}
 	else
 	{
@@ -50,7 +60,7 @@ void Background::Render(Gdiplus::Graphics& graphics)
 
 void Background::Update(double deltaSeconds)
 {
-	constexpr double SCROLL_SPEED = TARGET_FPS;
+	constexpr double SCROLL_SPEED = 120.0;
 
 	m_scrollAccumulator += deltaSeconds * SCROLL_SPEED; //스크롤 속도 조절
 
@@ -63,10 +73,9 @@ void Background::Update(double deltaSeconds)
 
 	m_scrollAccumulator -= scrollPixels;
 
-	m_posY += scrollPixels;
+	m_posY = (m_posY + scrollPixels) % m_height;
 
-	if (m_posY >= m_height)
-	{
-		m_posY %= m_height;
-	}
+	if(m_posY < 0)
+		m_posY += m_height;
+
 }

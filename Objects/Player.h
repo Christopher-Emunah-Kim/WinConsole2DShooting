@@ -8,7 +8,7 @@ namespace Gdiplus
 	class Bitmap;
 }
 
-constexpr double PLAYER_DEFAULT_SPEED = 25.0;
+constexpr double PLAYER_DEFAULT_SPEED = 150.0;
 constexpr int DEFAULT_PLAYER_IMAGE_SIZE = 48;
 
 class AirPlayer

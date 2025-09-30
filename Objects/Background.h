@@ -21,6 +21,6 @@ private:
 	int m_width;
 	int m_height;
 	Gdiplus::Bitmap* m_backgroundImage = nullptr;
-	double m_scrollAccumulator = 0.0;
+	double m_scrollAccumulator;
 };
 
