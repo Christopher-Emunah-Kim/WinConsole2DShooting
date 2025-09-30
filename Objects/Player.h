@@ -8,11 +8,15 @@ namespace Gdiplus
 	class Bitmap;
 }
 
+constexpr int PLAYER_DEFAULT_SPEED = 25;
+constexpr int DEFAULT_PLAYER_IMAGE_SIZE = 48;
 
 class AirPlayer
 {
 public:
-	AirPlayer(int w, int h, int spd, const std::wstring& imagePath);
+	AirPlayer() = delete;
+	explicit AirPlayer(const std::wstring& imagePath);
+
 	~AirPlayer();
 
 private:
@@ -39,6 +43,7 @@ private:
 	int m_width;
 	int m_height;
 	int m_speed;
+
 	Gdiplus::Bitmap* m_playerImage = nullptr;
 	std::unordered_map<WPARAM, bool> m_keyStates; //키 상태 저장용 맵
 };

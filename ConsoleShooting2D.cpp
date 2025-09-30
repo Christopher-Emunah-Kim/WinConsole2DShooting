@@ -27,9 +27,7 @@ Gdiplus::Graphics* g_backGraphics = nullptr; //백버퍼용 GDI+ 그래픽 객�
 ////250929 KHS PackMan 객체 포인터 생성
 ////250930 Player 클래스로 변경
 AirPlayer* k_AirPlayer = nullptr;
-constexpr int PLAYER_IMAGE_SIZE = 64;
 #endif
-constexpr int DEFAULT_PLAYER_IMAGE_SIZE = 64;
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -83,14 +81,33 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //IN
 	// MSG : 윈도우 메시지 구조체
 
 	// 기본 메시지 루프입니다: (메시지 큐에 들어온 메시지를 처리하는 반복문) (중요~!!)
-    while (GetMessage(&msg, nullptr, 0, 0))
+    while (true)
     {
-		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) //단축키 메시지인지 확인
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
-			TranslateMessage(&msg); //키보드 메시지를 변환 (가상키코드를 문자메시지로 변환)
-			DispatchMessage(&msg); //메시지를 해당 윈도우 프로시저로 전달
+            if (msg.message == WM_QUIT)
+                break;
+
+            if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))  //단축키 메시지인지 확인
+            {
+                TranslateMessage(&msg); //키보드 메시지를 변환 (가상키코드를 문자메시지로 변환)
+                DispatchMessage(&msg); //메시지를 해당 윈도우 프로시저로 전달
+            }
+        }
+        else
+        {
+            //게임 로직 및 렌더링
         }
     }
+
+  //  while (GetMessage(&msg, nullptr, 0, 0))
+  //  {
+		//if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) //단축키 메시지인지 확인
+  //      {
+		//	TranslateMessage(&msg); //키보드 메시지를 변환 (가상키코드를 문자메시지로 변환)
+		//	DispatchMessage(&msg); //메시지를 해당 윈도우 프로시저로 전달
+  //      }
+  //  }
 
 
 	//GDI+ 종료
@@ -183,7 +200,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    if (!k_AirPlayer)
    {
 	   std::wstring imagePath = L"./Images\\player.png";
-       k_AirPlayer = new AirPlayer(DEFAULT_PLAYER_IMAGE_SIZE, DEFAULT_PLAYER_IMAGE_SIZE, 20, imagePath); //AirPlayer 객체 생성
+       k_AirPlayer = new AirPlayer(imagePath); //AirPlayer 객체 생성
    }
 #endif
 

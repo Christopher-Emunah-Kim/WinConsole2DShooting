@@ -3,10 +3,11 @@
 #include "../Common.h"
 
 
-AirPlayer::AirPlayer(int w, int h, int spd, const std::wstring& imagePath)
-	: m_posX(0), m_posY(0), m_width(w), m_height(h), m_speed(spd), m_playerImage(nullptr)
+AirPlayer::AirPlayer(const std::wstring& imagePath)
+	: m_posX(0), m_posY(0), m_width(0), m_height(0), m_speed(0), m_playerImage(nullptr)
 {
 	m_keyStates.clear();
+	m_speed = PLAYER_DEFAULT_SPEED;
 
 	LoadPlayerImage(imagePath);
 	ResetStartPosition();
@@ -115,7 +116,7 @@ void AirPlayer::MoveDown()
 void AirPlayer::ResetStartPosition()
 {
 	m_posX = (WINDOW_WIDTH - m_width) / 2;
-	m_posY = (WINDOW_HEIGHT - m_height) / 2;
+	m_posY = (WINDOW_HEIGHT - m_height) / 2 + 150;
 }
 
 void AirPlayer::LoadPlayerImage(const std::wstring& imagePath)
@@ -133,6 +134,9 @@ void AirPlayer::LoadPlayerImage(const std::wstring& imagePath)
 		m_playerImage = nullptr;
 		return;
 	}
+
+	m_width = DEFAULT_PLAYER_IMAGE_SIZE;
+	m_height = DEFAULT_PLAYER_IMAGE_SIZE;
 
 	/*if (loadedImage->GetWidth() > 0 && loadedImage->GetHeight() > 0)
 	{
