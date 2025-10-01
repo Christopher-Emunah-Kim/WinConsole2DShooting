@@ -38,7 +38,7 @@ void GameMaster::Tick()
 
 	if (m_background)
 	{
-		m_background->Update(static_cast<float>(deltaSeconds));
+		m_background->Tick(static_cast<float>(deltaSeconds));
 	}
 	if (m_airPlayer)
 	{

@@ -1,10 +1,11 @@
 #pragma once
+#include "K_Actor.h"
 #include <string>
 
 const std::wstring blockImagePath = L"./Images\\block.png";
 constexpr int BLOCK_IMAGE_SIZE = 40;
 
-class Background
+class Background : public Actor
 {
 public:
 	Background() = delete;
@@ -16,16 +17,13 @@ private:
 	void LoadBackgroundImage(const std::wstring& imagePath);
 	void LoadBlockImage(const std::wstring& imagePath);
 public:
-	void Render(Gdiplus::Graphics& graphics);
-	void Update(double deltaSeconds);
+	virtual void Init() override;
+	virtual void Tick(float deltaSeconds) override;
+	virtual void Render(Gdiplus::Graphics& graphics) override;
+	virtual void Release() override;
+
 
 private:
-	int m_posX;
-	int m_posY;
-
-	int m_width;
-	int m_height;
-
 	Gdiplus::Bitmap* m_backgroundImage = nullptr;
 	Gdiplus::Bitmap* m_blockImage = nullptr;
 	double m_scrollAccumulator;
