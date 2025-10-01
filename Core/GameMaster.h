@@ -17,7 +17,12 @@ public:
 	GameMaster(GameMaster&&) = delete;
 	GameMaster& operator=(GameMaster&&) = delete;
 	
-	static GameMaster& GetInstance();
+	//SIGNLETON PATTERN
+	static GameMaster& GetInstance()
+	{
+		static GameMaster instance;
+		return instance;
+	}
 
 public:
 	void Initialize();
@@ -30,7 +35,6 @@ public:
 
 
 	void SetUpWindow(HWND hwnd);
-	//void SetRenderTargets(Gdiplus::Bitmap** backBuffer, Gdiplus::Graphics** backGraphics);
 
 	const TimeService* GetTimeService() const { return m_timeService.get(); }
 

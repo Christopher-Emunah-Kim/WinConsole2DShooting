@@ -7,12 +7,6 @@ GameMaster::~GameMaster()
 	Release();
 }
 
-GameMaster& GameMaster::GetInstance()
-{
-	static GameMaster instance;
-	return instance;
-}
-
 void GameMaster::Initialize()
 {
 	if(m_isInitialized)
