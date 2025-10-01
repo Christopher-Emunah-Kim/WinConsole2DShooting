@@ -71,7 +71,7 @@ void GameMaster::Tick(float deltaSeconds)
 	m_screenService->RequestRender();
 }
 
-void GameMaster::Render()
+void GameMaster::Render(HDC hdc)
 {
 	if(!m_screenService)
 		return;
@@ -88,12 +88,6 @@ void GameMaster::Render()
 
 	if(m_airPlayer)
 		m_airPlayer->Render(*backGraphics);
-}
-
-void GameMaster::Present(HDC hdc)
-{
-	if(!m_screenService)
-		return;
 
 	m_screenService->Present(hdc);
 }

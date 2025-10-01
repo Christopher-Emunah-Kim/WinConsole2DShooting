@@ -23,10 +23,10 @@ public:
 private:
 	void ResetStartPosition();
 
-	void MoveLeft(double distance);
-	void MoveRight(double distance);
-	void MoveUp(double distance);
-	void MoveDown(double distance);
+	void MoveLeft(float distance);
+	void MoveRight(float distance);
+	void MoveUp(float distance);
+	void MoveDown(float distance);
 
 public:
 	virtual void Init() override;
@@ -40,7 +40,7 @@ public:
 	inline float GetY() const { return m_position.y; }
 
 private:
-	double m_speed;
+	float m_speed;
 
 	std::unordered_map<WPARAM, bool> m_keyStates; //키 상태 저장용 맵
 };

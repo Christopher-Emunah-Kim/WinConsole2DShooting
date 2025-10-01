@@ -42,7 +42,7 @@ void AirPlayer::Tick(float deltaSeconds)
 	if (deltaSeconds <= 0.0)
 		return;
 
-	const double moveDistance = m_speed * deltaSeconds;
+	const float moveDistance = m_speed * deltaSeconds;
 
 	if (m_keyStates['A'] || m_keyStates[VK_LEFT])
 	{
@@ -87,7 +87,7 @@ bool AirPlayer::HandleInput(WPARAM wParam, bool isKeyDown)
 	return false;
 }
 
-void AirPlayer::MoveLeft(double distance)
+void AirPlayer::MoveLeft(float distance)
 {
 	m_position.x -= distance;
 
@@ -98,7 +98,7 @@ void AirPlayer::MoveLeft(double distance)
 	}
 }
 
-void AirPlayer::MoveRight(double distance)
+void AirPlayer::MoveRight(float distance)
 {
 	m_position.x += distance;
 
@@ -109,7 +109,7 @@ void AirPlayer::MoveRight(double distance)
 	}
 }
 
-void AirPlayer::MoveUp(double distance)
+void AirPlayer::MoveUp(float distance)
 {
 	m_position.y -= distance;
 
@@ -117,7 +117,7 @@ void AirPlayer::MoveUp(double distance)
 		m_position.y = 0.0;
 }
 
-void AirPlayer::MoveDown(double distance)
+void AirPlayer::MoveDown(float distance)
 {
 	m_position.y += distance;
 
@@ -129,5 +129,5 @@ void AirPlayer::MoveDown(double distance)
 void AirPlayer::ResetStartPosition()
 {
 	m_position.x = (WINDOW_WIDTH - m_width) / 2;
-	m_position.y = (WINDOW_HEIGHT - m_height) / 2 + 150.0;
+	m_position.y = (WINDOW_HEIGHT - m_height) / 2 + 150.0f;
 }

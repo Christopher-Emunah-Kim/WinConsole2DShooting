@@ -29,8 +29,7 @@ public:
 	void Release();
 
 	void Tick(float deltaSeconds);
-	void Render();
-	void Present(HDC hdc);
+	void Render(HDC hdc);
 	bool HandleInput(WPARAM wParam, bool isKeyDown);
 
 
