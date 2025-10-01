@@ -139,6 +139,7 @@
     <ClInclude Include="Objects\K_Actor.h" />
     <ClInclude Include="Objects\Background.h" />
     <ClInclude Include="Objects\Player.h" />
+    <ClInclude Include="Objects\Position.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Service\ScreenService.h" />

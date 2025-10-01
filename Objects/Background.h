@@ -24,7 +24,6 @@ public:
 
 
 private:
-	Gdiplus::Bitmap* m_backgroundImage = nullptr;
 	Gdiplus::Bitmap* m_blockImage = nullptr;
 	double m_scrollAccumulator;
 

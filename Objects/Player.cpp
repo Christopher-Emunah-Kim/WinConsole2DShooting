@@ -5,11 +5,10 @@
 
 
 AirPlayer::AirPlayer(const std::wstring& imagePath)
-	: Actor(), m_speed(PLAYER_DEFAULT_SPEED), m_playerImage(nullptr)
+	: Actor(imagePath), m_speed(PLAYER_DEFAULT_SPEED)
 {
 	m_keyStates.clear();
 
-	LoadPlayerImage(imagePath);
 	ResetStartPosition();
 }
 
@@ -20,32 +19,24 @@ AirPlayer::~AirPlayer()
 
 void AirPlayer::Render(Gdiplus::Graphics& graphics)
 {
-	if (m_playerImage)
-	{
-		graphics.DrawImage(m_playerImage, static_cast<int>(m_posX), static_cast<int>(m_posY), m_width, m_height);
-	}
-	else
-	{
-		Gdiplus::SolidBrush  yellowBrush(Gdiplus::Color(255, 255, 255, 0)); // 이미지 미사용 시 팩맨 모양 유지
-		graphics.FillPie(&yellowBrush, static_cast<int>(m_posX), static_cast<int>(m_posY), m_width, m_height, 210, 300);
-	}
+	Actor::Render(graphics);
+	
 }
 
 void AirPlayer::Release()
 {
-	if (m_playerImage)
-	{
-		delete m_playerImage;
-		m_playerImage = nullptr;
-	}
+	Actor::Release();
 }
 
 void AirPlayer::Init()
 {
+	Actor::Init();
 }
 
 void AirPlayer::Tick(float deltaSeconds)
 {
+	Actor::Tick(deltaSeconds);
+
 	if (deltaSeconds <= 0.0)
 		return;
 
@@ -96,76 +87,45 @@ bool AirPlayer::HandleInput(WPARAM wParam, bool isKeyDown)
 
 void AirPlayer::MoveLeft(double distance)
 {
-	m_posX -= distance;
+	m_position.x -= distance;
 
 	//왼쪽 테두리에 도달하면 오른쪽에서 재등장
-	if (m_posX < 0.0)
+	if (m_position.x < 0.0)
 	{
-		m_posX = WINDOW_WIDTH - m_width;
+		m_position.x = WINDOW_WIDTH - m_width;
 	}
 }
 
 void AirPlayer::MoveRight(double distance)
 {
-	m_posX += distance;
+	m_position.x += distance;
 
 	//벽을 넘어가면 다시 왼쪽에서 시작
-	if (m_posX + m_width > WINDOW_WIDTH)
+	if (m_position.x + m_width > WINDOW_WIDTH)
 	{
-		m_posX = 0.0;
+		m_position.x = 0.0;
 	}
 }
 
 void AirPlayer::MoveUp(double distance)
 {
-	m_posY -= distance;
+	m_position.y -= distance;
 
-	if (m_posY < 0.0)
-		m_posY = 0.0;
+	if (m_position.y < 0.0)
+		m_position.y = 0.0;
 }
 
 void AirPlayer::MoveDown(double distance)
 {
-	m_posY += distance;
+	m_position.y += distance;
 
-	if (m_posY + m_height > WINDOW_HEIGHT)
-		m_posY = WINDOW_HEIGHT - m_height;
+	if (m_position.y + m_height > WINDOW_HEIGHT)
+		m_position.y = WINDOW_HEIGHT - m_height;
 
 }
 
 void AirPlayer::ResetStartPosition()
 {
-	m_posX = (WINDOW_WIDTH - m_width) / 2;
-	m_posY = (WINDOW_HEIGHT - m_height) / 2 + 150.0;
+	m_position.x = (WINDOW_WIDTH - m_width) / 2;
+	m_position.y = (WINDOW_HEIGHT - m_height) / 2 + 150.0;
 }
-
-void AirPlayer::LoadPlayerImage(const std::wstring& imagePath)
-{
-	if(imagePath.empty())
-		return;
-
-	Gdiplus::Bitmap* loadedImage = Gdiplus::Bitmap::FromFile(imagePath.c_str());
-
-	if(!loadedImage || loadedImage->GetLastStatus() != Gdiplus::Ok)
-	{
-		if(loadedImage)
-			delete loadedImage;
-
-		m_playerImage = nullptr;
-		return;
-	}
-
-	m_width = DEFAULT_PLAYER_IMAGE_SIZE;
-	m_height = DEFAULT_PLAYER_IMAGE_SIZE;
-
-	/*if (loadedImage->GetWidth() > 0 && loadedImage->GetHeight() > 0)
-	{
-		m_width = loadedImage->GetWidth();
-		m_height = loadedImage->GetHeight();
-	}*/
-
-	m_playerImage = loadedImage;
-}
-
-
-

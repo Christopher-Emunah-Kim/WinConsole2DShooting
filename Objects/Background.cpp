@@ -4,19 +4,19 @@
 
 
 Background::Background(int windowWIdth, int windowHeight, const std::wstring& imagePath)
-	: Actor(),	m_backgroundImage(nullptr), m_blockImage(nullptr), 	m_scrollAccumulator(0.0), 
+	: Actor(imagePath),m_blockImage(nullptr), 	m_scrollAccumulator(0.0), 
 	m_blockRowY(0.0), m_blockSpeed(120.0), m_emptyBlockIndex(-1)
 {
 	m_width = windowWIdth;
 	m_height = windowHeight;
-
-	LoadBackgroundImage(imagePath);
 
 	Init();
 }
 
 void Background::Init()
 {
+	Actor::Init();
+
 	LoadBlockImage(blockImagePath);
 
 	if (m_blockImage)
@@ -30,25 +30,6 @@ void Background::Init()
 Background::~Background()
 {
 	Release();
-}
-
-
-void Background::LoadBackgroundImage(const std::wstring& imagePath)
-{
-	if(imagePath.empty())
-		return;
-
-	Gdiplus::Bitmap* loadedImage = Gdiplus::Bitmap::FromFile(imagePath.c_str());
-
-	if(!loadedImage || loadedImage->GetLastStatus() != Gdiplus::Ok)
-	{
-		if(loadedImage)
-			delete loadedImage;
-		m_backgroundImage = nullptr;
-		return;
-	}
-
-	m_backgroundImage = loadedImage;
 }
 
 void Background::LoadBlockImage(const std::wstring& imagePath)
@@ -70,9 +51,10 @@ void Background::LoadBlockImage(const std::wstring& imagePath)
 }
 
 
-
 void Background::Tick(float deltaSeconds)
 {
+	Actor::Tick(deltaSeconds);
+
 	constexpr double SCROLL_SPEED = 120.0;
 
 	m_scrollAccumulator += deltaSeconds * SCROLL_SPEED; //스크롤 속도 조절
@@ -84,10 +66,10 @@ void Background::Tick(float deltaSeconds)
 		m_scrollAccumulator -= scrollPixels;
 
 		//m_posY = static_cast<int>(m_posY + scrollPixels) % m_height;
-		m_posY = std::fmod(m_posY + scrollPixels, static_cast<double>(m_height));
+		m_position.y = std::fmod(m_position.y + scrollPixels, static_cast<double>(m_height));
 
-		if (m_posY < 0)
-			m_posY += m_height;
+		if (m_position.y < 0)
+			m_position.y += m_height;
 	}
 
 	if (m_blockImage)
@@ -108,24 +90,19 @@ void Background::Tick(float deltaSeconds)
 
 void Background::Render(Gdiplus::Graphics& graphics)
 {
-	if (m_backgroundImage)
+	if (m_image)
 	{
-		const double y0 = m_posY;
-		const double y1 = m_posY - m_height;
+		const float y0 = m_position.y;
+		const float y1 = m_position.y - m_height;
 
-		graphics.DrawImage(m_backgroundImage, static_cast<int>(m_posX), static_cast<int>(y0), m_width, m_height);
-		graphics.DrawImage(m_backgroundImage, static_cast<int>(m_posX), static_cast<int>(y1), m_width, m_height);
+		graphics.DrawImage(m_image, static_cast<int>(m_position.x), static_cast<int>(y0), m_width, m_height);
+		graphics.DrawImage(m_image, static_cast<int>(m_position.x), static_cast<int>(y1), m_width, m_height);
 
 		if (m_height < WINDOW_HEIGHT)
 		{
-			const double y2 = m_posY + m_height;
-			graphics.DrawImage(m_backgroundImage, static_cast<int>(m_posX), static_cast<int>(y2), m_width, m_height);
+			const float y2 = m_position.y + m_height;
+			graphics.DrawImage(m_image, static_cast<int>(m_position.x), static_cast<int>(y2), m_width, m_height);
 		}
-	}
-	else
-	{
-		Gdiplus::SolidBrush  blueBrush(Gdiplus::Color(255, 0, 0, 255)); // 이미지 미사용 시 파란색 배경
-		graphics.FillRectangle(&blueBrush, m_posX, m_posY, WINDOW_WIDTH, WINDOW_HEIGHT);
 	}
 
 	if (m_blockImage)
@@ -154,11 +131,8 @@ void Background::Render(Gdiplus::Graphics& graphics)
 
 void Background::Release()
 {
-	if (m_backgroundImage)
-	{
-		delete m_backgroundImage;
-		m_backgroundImage = nullptr;
-	}
+	Actor::Release();
+
 	if (m_blockImage)
 	{
 		delete m_blockImage;
