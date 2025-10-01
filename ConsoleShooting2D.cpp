@@ -44,8 +44,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //IN
 
 
     GameMaster::GetInstance().Initialize();
-	GameMaster::GetInstance().AddActor(new Background(WINDOW_WIDTH, WINDOW_HEIGHT, L"./Images\\backGround_1.png"));
-
+	
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_CONSOLESHOOTING2D, szWindowClass, MAX_LOADSTRING);

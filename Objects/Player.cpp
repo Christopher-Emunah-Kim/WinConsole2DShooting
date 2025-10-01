@@ -94,7 +94,7 @@ void AirPlayer::MoveLeft(float distance)
 	//왼쪽 테두리에 도달하면 오른쪽에서 재등장
 	if (m_position.x < 0.0)
 	{
-		m_position.x = WINDOW_WIDTH - m_width;
+		m_position.x = static_cast<float>(WINDOW_WIDTH - m_width);
 	}
 }
 
@@ -122,12 +122,12 @@ void AirPlayer::MoveDown(float distance)
 	m_position.y += distance;
 
 	if (m_position.y + m_height > WINDOW_HEIGHT)
-		m_position.y = WINDOW_HEIGHT - m_height;
+		m_position.y = static_cast<float>(WINDOW_HEIGHT - m_height);
 
 }
 
 void AirPlayer::ResetStartPosition()
 {
-	m_position.x = (WINDOW_WIDTH - m_width) / 2;
+	m_position.x = static_cast<float>((WINDOW_WIDTH - m_width) / 2);
 	m_position.y = (WINDOW_HEIGHT - m_height) / 2 + 150.0f;
 }

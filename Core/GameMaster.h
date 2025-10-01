@@ -1,7 +1,7 @@
 #pragma once
 #include "Service/TimeService.h"
 #include "Service/ScreenService.h"
-#include "Objects/Background.h"
+
 #include "Objects/Player.h"
 #include <memory>
 #include <Windows.h>
@@ -41,7 +41,6 @@ public:
 private:
 	std::unique_ptr<TimeService> m_timeService;
 	std::unique_ptr<ScreenService> m_screenService;
-
 	std::unique_ptr<AirPlayer> m_airPlayer;
 
 	std::vector<Actor*> m_actors;

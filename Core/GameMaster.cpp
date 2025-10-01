@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "GameMaster.h"
-#include "../Objects/K_Actor.h"
+#include "Objects/K_Actor.h"
+#include "Objects/Background.h"
 
 GameMaster::~GameMaster()
 {
@@ -19,10 +20,23 @@ void GameMaster::Initialize()
 	m_timeService->Init();
 
 	m_isInitialized = true;
+
+	AddActor(new Background(WINDOW_WIDTH, WINDOW_HEIGHT, L"./Images\\backGround_1.png"));
 }
 
 void GameMaster::Release()
 {
+	for (size_t i = 0; i < m_actors.size(); ++i)
+	{
+		if (m_actors[i])
+		{
+			m_actors[i]->Release();
+
+			delete m_actors[i];
+			m_actors[i] = nullptr;
+		}
+	}
+
 	if (m_airPlayer)
 	{
 		m_airPlayer.reset();
@@ -39,16 +53,6 @@ void GameMaster::Release()
 
 	m_isInitialized = false;
 
-	for(size_t i = 0; i < m_actors.size(); ++i)
-	{
-		if(m_actors[i])
-		{
-			m_actors[i]->Release();
-
-			delete m_actors[i];
-			m_actors[i] = nullptr;
-		}
-	}
 }
 
 
