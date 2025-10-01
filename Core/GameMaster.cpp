@@ -2,6 +2,7 @@
 #include "GameMaster.h"
 #include "Objects/K_Actor.h"
 #include "Objects/Background.h"
+#include "ResourceManager.h"
 
 GameMaster::~GameMaster()
 {
@@ -15,13 +16,32 @@ void GameMaster::Initialize()
 
 	m_timeService = std::make_unique<TimeService>();
 	m_screenService = std::make_unique<ScreenService>();
-	m_airPlayer = std::make_unique<AirPlayer>(L"./Images\\player.png");
-	
+
+	InitializeGameObjects();
+
 	m_timeService->Init();
 
 	m_isInitialized = true;
+}
 
-	AddActor(new Background(WINDOW_WIDTH, WINDOW_HEIGHT, L"./Images\\backGround_1.png"));
+void GameMaster::InitializeGameObjects()
+{
+	//Add ObjectType
+	ResourceManager::GetInstance()->AddObjectType(EObjectType::Player);
+	ResourceManager::GetInstance()->AddObjectType(EObjectType::BackGround_1);
+
+	//Load All Image Resources
+	ResourceManager::GetInstance()->LoadAllResources();
+
+	//Generate Objects
+	m_airPlayer = std::make_unique<AirPlayer>(EObjectType::Player);
+	m_airPlayer->SetRenderLayer(ERenderLayer::Player);
+
+	Background* background = new Background(WINDOW_WIDTH, WINDOW_HEIGHT, EObjectType::BackGround_1);
+	background->SetRenderLayer(ERenderLayer::Background);
+
+	//Add to Actor List
+	AddActor(background);
 }
 
 void GameMaster::Release()
@@ -83,23 +103,35 @@ void GameMaster::Render(HDC hdc)
 	if(!m_screenService)
 		return;
 
+	m_screenService->ClearBackBuffer();
+
+	RenderActors();
+
+	m_screenService->RenderToScreen(hdc);
+}
+
+void GameMaster::RenderActors()
+{
 	Gdiplus::Graphics* backGraphics = m_screenService->GetBackGraphics();
 
 	if (!backGraphics)
 		return;
 
-	m_screenService->ClearBackBuffer();
-
-	for (Actor* actor : m_actors)
+	//렌더링 순서에 따라 그리기
+	for (ERenderLayer layer = ERenderLayer::Background; layer <= ERenderLayer::UI; layer = static_cast<ERenderLayer>(static_cast<int>(layer) + 1))
 	{
-		if (actor)
-			actor->Render(*backGraphics);
+		for (Actor* actor : m_actors)
+		{
+			if (actor && actor->GetRenderLayer() == layer)
+			{
+				actor->Render(*backGraphics);
+			}
+		}
+		if (m_airPlayer && m_airPlayer->GetRenderLayer() == layer)
+		{
+			m_airPlayer->Render(*backGraphics);
+		}
 	}
-
-	if(m_airPlayer)
-		m_airPlayer->Render(*backGraphics);
-
-	m_screenService->Present(hdc);
 }
 
 bool GameMaster::HandleInput(WPARAM wParam, bool isKeyDown)

@@ -9,7 +9,7 @@ public:
 
 	void ClearBackBuffer();
 
-	void Present(HDC hdc);
+	void RenderToScreen(HDC hdc);
 	
 	void Release();
 

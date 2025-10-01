@@ -3,8 +3,8 @@
 #include <cmath>
 
 
-Background::Background(int windowWIdth, int windowHeight, const std::wstring& imagePath)
-	: Actor(imagePath),m_blockImage(nullptr), 	m_scrollAccumulator(0.0), 
+Background::Background(int windowWIdth, int windowHeight, EObjectType type)
+	: Actor(type),m_blockImage(nullptr), m_scrollAccumulator(0.0), 
 	m_blockRowY(0.0), m_blockSpeed(120.0), m_emptyBlockIndex(-1)
 {
 	m_width = windowWIdth;

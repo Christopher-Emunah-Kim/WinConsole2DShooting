@@ -43,7 +43,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //IN
 	Gdiplus::GdiplusStartup(&dwGdiplusToken, &gdiplusStartupInput, nullptr); //GDI+ 시작snsk qn
 
 
-    GameMaster::GetInstance().Initialize();
+    GameMaster::GetInstance()->Initialize();
 	
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -86,9 +86,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //IN
         }
        
         //게임 로직 및 렌더링
-        const float deltaSeconds = GameMaster::GetInstance().GetTimeService()->GetDeltaSeconds();
+        const float deltaSeconds = GameMaster::GetInstance()->GetTimeService()->GetDeltaSeconds();
 
-        GameMaster::GetInstance().Tick(deltaSeconds);
+        GameMaster::GetInstance()->Tick(deltaSeconds);
     }
 
 
@@ -203,7 +203,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE: //윈도우가 생성될 때
     {
-		GameMaster::GetInstance().SetUpWindow(hWnd);
+		GameMaster::GetInstance()->SetUpWindow(hWnd);
     }
     break;
 	case WM_COMMAND: // 메뉴, 버튼, 기타 컨트롤에서 전송된 명령 (잘 안씀)
@@ -228,7 +228,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
-            GameMaster::GetInstance().Render(hdc);
+            GameMaster::GetInstance()->Render(hdc);
 
             EndPaint(hWnd, &ps);
         }
@@ -269,7 +269,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
         }
 
-        if(GameMaster::GetInstance().HandleInput(wParam, true))
+        if(GameMaster::GetInstance()->HandleInput(wParam, true))
         {
 			//InvalidateRect(hWnd, nullptr, FALSE); //화면 갱신 요청
 		}
@@ -277,14 +277,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_KEYUP:
     {
-        if (GameMaster::GetInstance().HandleInput(wParam, false))
+        if (GameMaster::GetInstance()->HandleInput(wParam, false))
         {
         }
     }
         break;
     case WM_DESTROY: //윈도우가 파괴될 때 (종료)
     {
-        GameMaster::GetInstance().Release();
+        GameMaster::GetInstance()->Release();
 
         PostQuitMessage(0);
     }

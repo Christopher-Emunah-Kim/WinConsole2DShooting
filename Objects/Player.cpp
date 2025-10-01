@@ -4,8 +4,8 @@
 #include "../Core/GameMaster.h"
 
 
-AirPlayer::AirPlayer(const std::wstring& imagePath)
-	: Actor(imagePath), m_speed(PLAYER_DEFAULT_SPEED)
+AirPlayer::AirPlayer(EObjectType type)
+	: Actor(type), m_speed(PLAYER_DEFAULT_SPEED)
 {
 	m_keyStates.clear();
 

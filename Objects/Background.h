@@ -9,12 +9,11 @@ class Background : public Actor
 {
 public:
 	Background() = delete;
-	explicit Background(int windowWIdth, int windowHeight, const std::wstring& imagePath);
+	explicit Background(int windowWIdth, int windowHeight, EObjectType type);
 
 	~Background();
 
 private:
-	void LoadBackgroundImage(const std::wstring& imagePath);
 	void LoadBlockImage(const std::wstring& imagePath);
 public:
 	virtual void Init() override;
@@ -26,7 +25,6 @@ public:
 private:
 	Gdiplus::Bitmap* m_blockImage = nullptr;
 	double m_scrollAccumulator;
-
 	double m_blockRowY;
 	double m_blockSpeed;
 	int m_emptyBlockIndex;

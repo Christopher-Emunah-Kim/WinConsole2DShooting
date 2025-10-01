@@ -56,7 +56,7 @@ void ScreenService::ClearBackBuffer()
 }
 
 
-void ScreenService::Present(HDC hdc)
+void ScreenService::RenderToScreen(HDC hdc)
 {
 	if (!hdc)
 	{

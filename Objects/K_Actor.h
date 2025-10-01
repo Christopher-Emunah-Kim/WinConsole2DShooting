@@ -5,7 +5,7 @@ class Actor
 {
 public:
 	Actor() = delete;
-	explicit Actor(const std::wstring& imagePath);
+	explicit Actor(EObjectType type);
 	virtual ~Actor();
 
 private:
@@ -20,12 +20,12 @@ public:
 	void SetPosition(float x, float y);
 	void SetPivot(float x, float y);
 	void SetSize(int width, int height);
-
-
+	void SetRenderLayer(ERenderLayer layer);
 
 	inline const Position& GetPosition() const { return m_position; }
 	inline int GetWidth() const { return m_width; }
 	inline int GetHeight() const { return m_height; }
+	inline ERenderLayer GetRenderLayer() const { return targetLayer; }
 
 protected:
 	Position m_position;
@@ -35,5 +35,8 @@ protected:
 	int m_height;
 
 	Gdiplus::Bitmap* m_image;
+
+private:
+	ERenderLayer targetLayer = ERenderLayer::Default;
 };
 

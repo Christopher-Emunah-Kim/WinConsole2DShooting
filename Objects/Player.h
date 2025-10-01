@@ -16,7 +16,7 @@ class AirPlayer : public Actor
 {
 public:
 	AirPlayer() = delete;
-	explicit AirPlayer(const std::wstring& imagePath);
+	explicit AirPlayer(EObjectType type);
 
 	virtual ~AirPlayer();
 

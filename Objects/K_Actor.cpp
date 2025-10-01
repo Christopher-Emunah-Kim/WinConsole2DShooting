@@ -1,11 +1,12 @@
 #include "pch.h"
 #include "K_Actor.h"
+#include "../Core/ResourceManager.h"
 
 
-Actor::Actor(const std::wstring& imagePath)
-	: m_position(), m_pivot(0.5f, 0.5f), m_width(0), m_height(0), m_image(nullptr)
+Actor::Actor(EObjectType type)
+	: m_position(), m_pivot(0.5f, 0.5f), m_width(0), m_height(0)
 {
-	LoadImage(imagePath);
+	m_image = ResourceManager::GetInstance()->GetImage(type, 0);
 }
 
 Actor::~Actor()
@@ -54,6 +55,7 @@ void Actor::LoadImage(const std::wstring& imagePath)
 		if (loadedImage)
 			delete loadedImage;
 		m_image = nullptr;
+
 		return;
 	}
 
@@ -82,3 +84,9 @@ void Actor::SetSize(int width, int height)
 	m_width = width;
 	m_height = height;
 }
+
+void Actor::SetRenderLayer(ERenderLayer layer)
+{ 
+	targetLayer = layer; 
+}
+

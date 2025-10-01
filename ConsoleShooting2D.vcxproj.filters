@@ -54,6 +54,15 @@
     <ClInclude Include="Objects\Position.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Enums.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ResourceManager.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Singleton.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleShooting2D.cpp">
@@ -78,6 +87,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Objects\K_Actor.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ResourceManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
