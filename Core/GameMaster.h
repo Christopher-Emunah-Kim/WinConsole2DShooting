@@ -34,14 +34,15 @@ public:
 
 
 	void SetUpWindow(HWND hwnd);
+	void AddActor(Actor* actor);
 
 	const TimeService* GetTimeService() const { return m_timeService.get(); }
 
 private:
 	std::unique_ptr<TimeService> m_timeService;
 	std::unique_ptr<ScreenService> m_screenService;
+
 	std::unique_ptr<AirPlayer> m_airPlayer;
-	std::unique_ptr<Background> m_background;
 
 	std::vector<Actor*> m_actors;
 

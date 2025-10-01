@@ -14,17 +14,11 @@ void GameMaster::Initialize()
 
 	m_timeService = std::make_unique<TimeService>();
 	m_screenService = std::make_unique<ScreenService>();
+	m_airPlayer = std::make_unique<AirPlayer>(L"./Images\\player.png");
 	
 	m_timeService->Init();
 
-	std::wstring playerImagePath = L"./Images\\player.png";
-	std::wstring bgImagePath = L"./Images\\backGround_1.png";
-	
-	m_airPlayer = std::make_unique<AirPlayer>(playerImagePath);
-	m_background = std::make_unique<Background>(WINDOW_WIDTH, WINDOW_HEIGHT, bgImagePath);
-
 	m_isInitialized = true;
-
 }
 
 void GameMaster::Release()
@@ -32,10 +26,6 @@ void GameMaster::Release()
 	if (m_airPlayer)
 	{
 		m_airPlayer.reset();
-	}
-	if (m_background)
-	{
-		m_background.reset();
 	}
 	if (m_screenService)
 	{
@@ -48,6 +38,17 @@ void GameMaster::Release()
 	}
 
 	m_isInitialized = false;
+
+	for(size_t i = 0; i < m_actors.size(); ++i)
+	{
+		if(m_actors[i])
+		{
+			m_actors[i]->Release();
+
+			delete m_actors[i];
+			m_actors[i] = nullptr;
+		}
+	}
 }
 
 
@@ -59,13 +60,15 @@ void GameMaster::Tick(float deltaSeconds)
 	if (false == m_timeService->CanUpdate())
 		return;
 
-	if (m_background)
+	for(Actor* actor : m_actors)
 	{
-		m_background->Tick(static_cast<float>(deltaSeconds));
+		if(actor)
+			actor->Tick(deltaSeconds);
 	}
+	
 	if (m_airPlayer)
 	{
-		m_airPlayer->Tick(static_cast<float>(deltaSeconds));
+		m_airPlayer->Tick(deltaSeconds);
 	}
 
 	m_screenService->RequestRender();
@@ -83,8 +86,11 @@ void GameMaster::Render(HDC hdc)
 
 	m_screenService->ClearBackBuffer();
 
-	if(m_background)
-		m_background->Render(*backGraphics);
+	for (Actor* actor : m_actors)
+	{
+		if (actor)
+			actor->Render(*backGraphics);
+	}
 
 	if(m_airPlayer)
 		m_airPlayer->Render(*backGraphics);
@@ -113,4 +119,10 @@ void GameMaster::SetUpWindow(HWND hwnd)
 		return;
 
 	m_screenService->Initialize(hwnd);
+}
+
+void GameMaster::AddActor(Actor* actor)
+{
+	if(actor)
+		m_actors.push_back(actor);
 }
