@@ -14,7 +14,7 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름�
 
 ////250929 KHS PackMan 객체 포인터 생성
 ////250930 Player 클래스로 변경
-std::unique_ptr<GameMaster> k_GameMaster = nullptr; //게임 마스터 객체 포인터
+//std::unique_ptr<GameMaster> k_GameMaster = nullptr; //게임 마스터 객체 포인터
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -49,11 +49,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //IN
     LoadStringW(hInstance, IDC_CONSOLESHOOTING2D, szWindowClass, MAX_LOADSTRING);
 
 
-    k_GameMaster = std::make_unique<GameMaster>();
-    if (k_GameMaster)
-    {
-        k_GameMaster->Initialize();
-    }
+    GameMaster::GetInstance().Initialize();
 
 
 	MyRegisterClass(hInstance); //Window Class 등록 (중요~!!)
@@ -93,12 +89,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //IN
         }
        
         //게임 로직 및 렌더링
-        if (!k_GameMaster)
-			continue;
+        const float deltaSeconds = GameMaster::GetInstance().GetTimeService()->GetDeltaSeconds();
 
-        const float deltaSeconds = k_GameMaster->GetTimeService()->GetDeltaSeconds();
-
-		k_GameMaster->Tick(deltaSeconds);
+        GameMaster::GetInstance().Tick(deltaSeconds);
     }
 
 
@@ -213,11 +206,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE: //윈도우가 생성될 때
     {
-        if (k_GameMaster)
-        {
-			k_GameMaster->SetUpWindow(hWnd);
-			//k_GameMaster->SetRenderTargets(&g_backBuffer, &g_backGraphics);
-        }
+		GameMaster::GetInstance().SetUpWindow(hWnd);
     }
     break;
 	case WM_COMMAND: // 메뉴, 버튼, 기타 컨트롤에서 전송된 명령 (잘 안씀)
@@ -243,11 +232,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
 
-            if (k_GameMaster)
-            {
-				k_GameMaster->Render(); //게임 마스터 렌더링
-				k_GameMaster->Present(hdc); //게임 마스터 프리젠트
-            }
+            GameMaster::GetInstance().Render();
+            GameMaster::GetInstance().Present(hdc);
 
             EndPaint(hWnd, &ps);
         }
@@ -288,7 +274,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
         }
 
-        if(k_GameMaster && k_GameMaster->HandleInput(wParam, true))
+        if(GameMaster::GetInstance().HandleInput(wParam, true))
         {
 			//InvalidateRect(hWnd, nullptr, FALSE); //화면 갱신 요청
 		}
@@ -296,18 +282,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_KEYUP:
     {
-        if (k_GameMaster && k_GameMaster->HandleInput(wParam, false))
+        if (GameMaster::GetInstance().HandleInput(wParam, false))
         {
         }
     }
         break;
     case WM_DESTROY: //윈도우가 파괴될 때 (종료)
     {
-        if (k_GameMaster)
-        {
-			k_GameMaster->Release();
-			k_GameMaster.reset();
-        }
+        GameMaster::GetInstance().Release();
 
         PostQuitMessage(0);
     }

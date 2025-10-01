@@ -12,6 +12,13 @@ public:
 	GameMaster() = default;
 	~GameMaster();
 
+	GameMaster(const GameMaster&) = delete;
+	GameMaster& operator=(const GameMaster&) = delete;
+	GameMaster(GameMaster&&) = delete;
+	GameMaster& operator=(GameMaster&&) = delete;
+	
+	static GameMaster& GetInstance();
+
 public:
 	void Initialize();
 	void Release();
