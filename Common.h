@@ -1,6 +1,6 @@
 #pragma once
 
-
+//필요 상수 정의
 constexpr int APP_POSITION_X = 500;
 constexpr int APP_POSITION_Y = 15;
 constexpr int WINDOW_WIDTH = 560;

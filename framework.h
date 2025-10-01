@@ -16,3 +16,8 @@
 
 //추가필요헤더
 #include <memory>
+#include <string>
+#include <vector>
+#include <unordered_map>
+
+#include <chrono>

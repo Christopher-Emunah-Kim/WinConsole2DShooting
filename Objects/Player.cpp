@@ -1,12 +1,11 @@
 #include "pch.h"
 #include "Player.h"
-#include "../Common.h"
 #include "Background.h"
 #include "../Core/GameMaster.h"
 
 
 AirPlayer::AirPlayer(const std::wstring& imagePath)
-	: m_posX(0.0), m_posY(0.0), m_width(0), m_height(0), m_speed(PLAYER_DEFAULT_SPEED), m_playerImage(nullptr)
+	: Actor(), m_speed(PLAYER_DEFAULT_SPEED), m_playerImage(nullptr)
 {
 	m_keyStates.clear();
 
@@ -16,11 +15,7 @@ AirPlayer::AirPlayer(const std::wstring& imagePath)
 
 AirPlayer::~AirPlayer()
 {
-	if (m_playerImage)
-	{
-		delete m_playerImage;
-		m_playerImage = nullptr;
-	}
+	Release();
 }
 
 void AirPlayer::Render(Gdiplus::Graphics& graphics)
@@ -32,13 +27,26 @@ void AirPlayer::Render(Gdiplus::Graphics& graphics)
 	else
 	{
 		Gdiplus::SolidBrush  yellowBrush(Gdiplus::Color(255, 255, 255, 0)); // 이미지 미사용 시 팩맨 모양 유지
-		graphics.FillPie(&yellowBrush, m_posX, m_posY, m_width, m_height, 210, 300);
+		graphics.FillPie(&yellowBrush, static_cast<int>(m_posX), static_cast<int>(m_posY), m_width, m_height, 210, 300);
 	}
 }
 
-void AirPlayer::Update(double deltaSeconds)
+void AirPlayer::Release()
 {
-	if(deltaSeconds <= 0.0)
+	if (m_playerImage)
+	{
+		delete m_playerImage;
+		m_playerImage = nullptr;
+	}
+}
+
+void AirPlayer::Init()
+{
+}
+
+void AirPlayer::Tick(float deltaSeconds)
+{
+	if (deltaSeconds <= 0.0)
 		return;
 
 	const double moveDistance = m_speed * deltaSeconds;
@@ -63,6 +71,7 @@ void AirPlayer::Update(double deltaSeconds)
 		MoveDown(moveDistance);
 	}
 }
+
 
 bool AirPlayer::HandleInput(WPARAM wParam, bool isKeyDown)
 {
