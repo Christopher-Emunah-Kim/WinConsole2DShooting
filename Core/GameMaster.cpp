@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "GameMaster.h"
-
-
+#include "../Objects/K_Actor.h"
 
 GameMaster::~GameMaster()
 {
@@ -37,7 +36,14 @@ void GameMaster::Tick()
 
 	const double deltaSeconds = static_cast<double>(m_timeService->GetDeltaSeconds());
 
-	Update(deltaSeconds);
+	if (m_background)
+	{
+		m_background->Update(static_cast<float>(deltaSeconds));
+	}
+	if (m_airPlayer)
+	{
+		m_airPlayer->Tick(static_cast<float>(deltaSeconds));
+	}
 
 	m_screenService->RequestRender();
 }
@@ -99,21 +105,6 @@ void GameMaster::SetRenderTargets(Gdiplus::Bitmap** backBuffer, Gdiplus::Graphic
 		m_screenService->SetRenderTargets(backBuffer, backGraphics);
 	}
 }
-
-
-void GameMaster::Update(double deltaSeconds)
-{
-	if(m_background)
-	{
-		m_background->Update(deltaSeconds);
-	}
-	if (m_airPlayer)
-	{
-		m_airPlayer->Update(deltaSeconds);
-	}
-}
-
-
 
 void GameMaster::Release()
 {

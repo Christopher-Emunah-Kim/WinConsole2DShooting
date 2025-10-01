@@ -12,9 +12,6 @@ public:
 	GameMaster() = default;
 	~GameMaster();
 
-private:
-	void Update(double deltaSeconds);
-
 public:
 	void Initialize();
 
