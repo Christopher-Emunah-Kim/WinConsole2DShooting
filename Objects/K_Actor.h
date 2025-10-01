@@ -21,6 +21,8 @@ public:
 	void SetPivot(float x, float y);
 	void SetSize(int width, int height);
 
+
+
 	inline const Position& GetPosition() const { return m_position; }
 	inline int GetWidth() const { return m_width; }
 	inline int GetHeight() const { return m_height; }

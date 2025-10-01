@@ -10,6 +10,8 @@ AirPlayer::AirPlayer(const std::wstring& imagePath)
 	m_keyStates.clear();
 
 	ResetStartPosition();
+
+	SetSize(DEFAULT_PLAYER_IMAGE_SIZE, DEFAULT_PLAYER_IMAGE_SIZE);
 }
 
 AirPlayer::~AirPlayer()
