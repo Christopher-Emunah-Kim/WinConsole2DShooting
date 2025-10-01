@@ -11,9 +11,6 @@ HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
-//Back Buffer
-Gdiplus::Bitmap* g_backBuffer = nullptr; //백버퍼용 GDI+ 비트맵 객체 포인터
-Gdiplus::Graphics* g_backGraphics = nullptr; //백버퍼용 GDI+ 그래픽 객체 포인터
 
 ////250929 KHS PackMan 객체 포인터 생성
 ////250930 Player 클래스로 변경
@@ -96,10 +93,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //IN
         }
        
         //게임 로직 및 렌더링
-        if (!g_backBuffer || !g_backGraphics || !k_GameMaster)
+        if (!k_GameMaster)
 			continue;
 
-		k_GameMaster->Tick(); 
+        const float deltaSeconds = k_GameMaster->GetTimeService()->GetDeltaSeconds();
+
+		k_GameMaster->Tick(deltaSeconds);
     }
 
 
@@ -214,27 +213,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE: //윈도우가 생성될 때
     {
-        //백버퍼용 GDI+ 비트맵 객체 생성
-        if (g_backBuffer == nullptr)
-        {
-            g_backBuffer = new Gdiplus::Bitmap(WINDOW_WIDTH, WINDOW_HEIGHT, PixelFormat32bppARGB );
-        }
-        //백버퍼용 GDI+ 그래픽 객체 생성
-        if (g_backGraphics == nullptr && g_backBuffer != nullptr)
-        {
-            g_backGraphics = Gdiplus::Graphics::FromImage(g_backBuffer);
-		}
-        
-		if (!g_backGraphics) //백버퍼용 그래픽 객체 생성 실패시
-        {
-            MessageBox(hWnd, L"Back Buffer Graphics Create Failed!", L"Error", MB_OK | MB_ICONERROR);
-			PostQuitMessage(0); //프로그램 종료
-        }
-
         if (k_GameMaster)
         {
 			k_GameMaster->SetUpWindow(hWnd);
-			k_GameMaster->SetRenderTargets(&g_backBuffer, &g_backGraphics);
+			//k_GameMaster->SetRenderTargets(&g_backBuffer, &g_backGraphics);
         }
     }
     break;
@@ -265,12 +247,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
 				k_GameMaster->Render(); //게임 마스터 렌더링
 				k_GameMaster->Present(hdc); //게임 마스터 프리젠트
-            }
-
-            if (!g_backGraphics)
-            {
-                EndPaint(hWnd, &ps);
-				break;
             }
 
             EndPaint(hWnd, &ps);
@@ -333,18 +309,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			k_GameMaster.reset();
         }
 
-        //백버퍼용 GDI+ 그래픽 객체 삭제
-        if (g_backGraphics)
-        {
-            delete g_backGraphics;
-            g_backGraphics = nullptr;
-        }
-        //백버퍼용 GDI+ 비트맵 객체 삭제
-        if (g_backBuffer)
-        {
-            delete g_backBuffer;
-            g_backBuffer = nullptr;
-        }
         PostQuitMessage(0);
     }
         break;

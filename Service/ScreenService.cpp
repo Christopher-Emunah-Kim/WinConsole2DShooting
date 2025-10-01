@@ -4,15 +4,40 @@
 void ScreenService::Initialize(HWND hWnd)
 {
 	m_hWnd = hWnd;
+
+	//백버퍼용 GDI+ 비트맵 객체 생성
+	if (m_backBuffer == nullptr)
+	{
+		m_backBuffer = new Gdiplus::Bitmap(WINDOW_WIDTH, WINDOW_HEIGHT, PixelFormat32bppARGB);
+	}
+	//백버퍼용 GDI+ 그래픽 객체 생성
+	if (m_backGraphics == nullptr && m_backBuffer != nullptr)
+	{
+		m_backGraphics = Gdiplus::Graphics::FromImage(m_backBuffer);
+	}
+
+	if (!m_backGraphics) //백버퍼용 그래픽 객체 생성 실패시
+	{
+		MessageBox(hWnd, L"Back Buffer Graphics Create Failed!", L"Error", MB_OK | MB_ICONERROR);
+		PostQuitMessage(0); //프로그램 종료
+	}
 }
 
-void ScreenService::SetRenderTargets(Gdiplus::Bitmap** backBuffer, Gdiplus::Graphics** backGraphics)
+void ScreenService::Release()
 {
-	if (backBuffer)
-		m_backBuffer = *backBuffer;
-	if (backGraphics)
-		m_backGraphics = *backGraphics;
+	if (m_backGraphics)
+	{
+		delete m_backGraphics;
+		m_backGraphics = nullptr;
+	}
+	if (m_backBuffer)
+	{
+		delete m_backBuffer;
+		m_backBuffer = nullptr;
+	}
+	m_hWnd = nullptr;
 }
+
 
 void ScreenService::RequestRender()
 {

@@ -14,26 +14,30 @@ public:
 
 public:
 	void Initialize();
-
-	void Tick();
-
-	void Render();
-
-	void Present(HDC hdc);
-
-	bool HandleInput(WPARAM wParam, bool isKeyDown);
-
 	void Release();
 
-	void SetUpWindow(HWND hwnd);
+	void Tick(float deltaSeconds);
+	void Render();
+	void Present(HDC hdc);
+	bool HandleInput(WPARAM wParam, bool isKeyDown);
 
-	void SetRenderTargets(Gdiplus::Bitmap** backBuffer, Gdiplus::Graphics** backGraphics);
+
+	void SetUpWindow(HWND hwnd);
+	//void SetRenderTargets(Gdiplus::Bitmap** backBuffer, Gdiplus::Graphics** backGraphics);
+
+	const TimeService* GetTimeService() const { return m_timeService.get(); }
 
 private:
 	std::unique_ptr<TimeService> m_timeService;
 	std::unique_ptr<ScreenService> m_screenService;
 	std::unique_ptr<AirPlayer> m_airPlayer;
 	std::unique_ptr<Background> m_background;
+
+	std::vector<Actor*> m_actors;
+
+	//Back Buffer
+	Gdiplus::Bitmap* m_backBuffer = nullptr; //백버퍼용 GDI+ 비트맵 객체 포인터
+	Gdiplus::Graphics* m_backGraphics = nullptr; //백버퍼용 GDI+ 그래픽 객체 포인터
 
 	bool m_isInitialized = false;
 };

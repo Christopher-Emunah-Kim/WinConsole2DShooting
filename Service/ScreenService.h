@@ -5,16 +5,17 @@ class ScreenService
 public:
 	void Initialize(HWND hWnd);
 
-	void SetRenderTargets(Gdiplus::Bitmap** backBuffer, Gdiplus::Graphics** backGraphics);
-
 	void RequestRender();
 
 	void ClearBackBuffer();
 
 	void Present(HDC hdc);
+	
+	void Release();
 
 	inline Gdiplus::Graphics* GetBackGraphics() const { return m_backGraphics; }
 	inline Gdiplus::Bitmap* GetBackBuffer() const { return m_backBuffer; }
+	inline const HWND& GetHwnd() const { return m_hWnd; }
 
 private:
 	HWND m_hWnd = nullptr;
