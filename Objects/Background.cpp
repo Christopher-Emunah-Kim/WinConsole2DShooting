@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Background.h"
+#include <cmath>
 
 
 Background::Background(int windowWIdth, int windowHeight, const std::wstring& imagePath)
@@ -82,7 +83,8 @@ void Background::Tick(float deltaSeconds)
 	{
 		m_scrollAccumulator -= scrollPixels;
 
-		m_posY = static_cast<int>(m_posY + scrollPixels) % m_height;
+		//m_posY = static_cast<int>(m_posY + scrollPixels) % m_height;
+		m_posY = std::fmod(m_posY + scrollPixels, static_cast<double>(m_height));
 
 		if (m_posY < 0)
 			m_posY += m_height;
