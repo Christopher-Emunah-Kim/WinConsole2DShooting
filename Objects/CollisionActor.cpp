@@ -6,7 +6,7 @@
 
 bool CollisionActor::CheckCircleToCircleCollision(const CollisionActor* from, const CollisionActor* to)
 {
-	if(!from || !to)
+	if (!from || !to)
 		return false;
 
 	const Position& pos1 = from->GetPosition();

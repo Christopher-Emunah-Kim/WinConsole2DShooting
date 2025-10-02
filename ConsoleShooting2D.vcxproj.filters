@@ -69,6 +69,12 @@
     <ClInclude Include="Objects\CollisionActor.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Components\Component.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\PhysicsComponent.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleShooting2D.cpp">
@@ -99,6 +105,12 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Objects\CollisionActor.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\Component.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\PhysicsComponent.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

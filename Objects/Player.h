@@ -33,6 +33,7 @@ public:
 	virtual void Tick(float deltaSeconds) override;
 	virtual void Render(Gdiplus::Graphics& graphics) override;
 	virtual void Release() override;
+	virtual void OverlapWith(Actor* other) override;
 
 	bool HandleInput(WPARAM wParam, bool isKeyDown);
 

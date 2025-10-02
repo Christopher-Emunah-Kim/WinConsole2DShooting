@@ -139,3 +139,7 @@ void Background::Release()
 		m_blockImage = nullptr;
 	}
 }
+
+void Background::OverlapWith(Actor* other)
+{
+}

@@ -1,6 +1,8 @@
 #pragma once
 #include "../framework.h"
 
+class Component;
+
 class Actor
 {
 public:
@@ -17,6 +19,27 @@ public:
 	virtual void Render(Gdiplus::Graphics& graphics);
 	virtual void Release();
 
+	virtual void OverlapWith(Actor* other);
+
+	void AddComponent(Component* component);
+	void RemoveComponent(Component* component);
+
+	template<typename T>
+	T* GetComponent() const
+	{
+		static_assert(std::is_base_of<Component, T>::value, "T mus be derived from Component");
+
+		for (Component* comp : m_components)
+		{
+			if (T* castedComp = dynamic_cast<T*>(comp))
+			{
+				return castedComp;
+			}
+		}
+
+		return nullptr;
+	};
+
 	void SetPosition(float x, float y);
 	void SetPivot(float x, float y);
 	void SetSize(int width, int height);
@@ -32,6 +55,7 @@ public:
 protected:
 	Position m_position;
 	Position m_pivot;
+	std::vector<Component*> m_components;
 
 	int m_width;
 	int m_height;

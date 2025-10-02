@@ -18,6 +18,13 @@ private:
 	bool CheckRectToCircleCollision(const CollisionActor* fromRect, const CollisionActor* toCirtle);
 
 public:
+	virtual void Init() override {}
+	virtual void Tick(float deltaSeconds) override {}
+	virtual void Render(Gdiplus::Graphics& graphics) override { }
+	virtual void Release() override {}
+	virtual void OverlapWith(Actor* other) override {}
+
+
 	void PrintCollisionResult(const CollisionActor* target);
 
 private:

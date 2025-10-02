@@ -30,6 +30,10 @@ void AirPlayer::Release()
 	Actor::Release();
 }
 
+void AirPlayer::OverlapWith(Actor* other)
+{
+}
+
 void AirPlayer::Init()
 {
 	Actor::Init();

@@ -37,3 +37,24 @@ enum class EObjectType
 	number9,
 	MAX
 };
+
+
+enum class ECollisionType
+{
+	None,
+	Circle,
+	Rect,
+};
+
+enum class EPhysicsLayer
+{
+	None = 0,
+	Player,
+	Bomb
+};
+
+enum class EGameState
+{
+	Playing,
+	GameOver,
+};

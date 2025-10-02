@@ -44,6 +44,18 @@ void Actor::Release()
 	}
 }
 
+void Actor::OverlapWith(Actor* other)
+{
+}
+
+void Actor::AddComponent(Component* component)
+{
+}
+
+void Actor::RemoveComponent(Component* component)
+{
+}
+
 void Actor::LoadImage(const std::wstring& imagePath)
 {
 	if (imagePath.empty())

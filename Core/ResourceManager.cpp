@@ -86,6 +86,7 @@ std::wstring ResourceManager::ToWstring(EObjectType type)
 	case EObjectType::Goal:			return L"Goal";
 	case EObjectType::BackGround_1:	return L"BackGround_1";
 	case EObjectType::Background_2:	return L"Background_2";
+	case EObjectType::Collision:	return L"Collision";
 
 	default:						return L"Unknown";
 	}
