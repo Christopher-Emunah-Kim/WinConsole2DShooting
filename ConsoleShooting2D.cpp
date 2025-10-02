@@ -3,6 +3,9 @@
 
 #include "pch.h"
 #include "Core/GameMaster.h"
+#include "Core/ResourceManager.h"
+#include "Objects/CollisionActor.h"
+#include "Core/ActorFactory.h"
 
 #define MAX_LOADSTRING 100
 
@@ -43,8 +46,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //IN
 	Gdiplus::GdiplusStartup(&dwGdiplusToken, &gdiplusStartupInput, nullptr); //GDI+ 시작snsk qn
 
 
+    ResourceManager::GetInstance()->Initialize();
     GameMaster::GetInstance()->Initialize();
-	
+	CollisionActor* test1 = Factory::GetInstance()->SpawnActor<CollisionActor>(EObjectType::Collision, ERenderLayer::Collision);
+	test1->SetPosition(200.0f, 200.0f);
+	CollisionActor* test2 = Factory::GetInstance()->SpawnActor<CollisionActor>(EObjectType::Collision, ERenderLayer::Collision);
+	test2->SetPosition(300.0f, 300.0f);
+
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_CONSOLESHOOTING2D, szWindowClass, MAX_LOADSTRING);

@@ -27,13 +27,9 @@ void GameMaster::Initialize()
 
 void GameMaster::InitializeGameObjects()
 {
-	ResourceManager::GetInstance()->Initialize();
-
-	//Generate Objects
 	m_airPlayer = std::make_unique<AirPlayer>(EObjectType::Player);
 	m_airPlayer->SetRenderLayer(ERenderLayer::Player);
 
-	//일반 Actor들은 Factory클래스 사용
 	Factory::GetInstance()->SpawnActor<Background>(EObjectType::BackGround_1, ERenderLayer::Background);
 }
 
@@ -124,7 +120,6 @@ void GameMaster::RenderActors()
 	if (!backGraphics)
 		return;
 
-	//map키가 이미 레이어순 정렬되어있으므로 순회하면서 Render
 	for (const auto& layerPair : m_actors)
 	{
 		for (Actor* actor : layerPair.second)
@@ -134,7 +129,6 @@ void GameMaster::RenderActors()
 		}
 	}
 
-	//플레이어는 최상단에.
 	if (m_airPlayer)
 	{
 		m_airPlayer->Render(*backGraphics);

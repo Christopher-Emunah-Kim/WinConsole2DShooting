@@ -140,6 +140,7 @@
     <ClInclude Include="Core\Singleton.h" />
     <ClInclude Include="Enums.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="Objects\CollisionActor.h" />
     <ClInclude Include="Objects\K_Actor.h" />
     <ClInclude Include="Objects\Background.h" />
     <ClInclude Include="Objects\Player.h" />
@@ -154,6 +155,7 @@
     <ClCompile Include="ConsoleShooting2D.cpp" />
     <ClCompile Include="Core\GameMaster.cpp" />
     <ClCompile Include="Core\ResourceManager.cpp" />
+    <ClCompile Include="Objects\CollisionActor.cpp" />
     <ClCompile Include="Objects\K_Actor.cpp" />
     <ClCompile Include="Objects\Background.cpp" />
     <ClCompile Include="Objects\Player.cpp" />

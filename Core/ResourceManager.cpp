@@ -19,6 +19,7 @@ void ResourceManager::Initialize()
 	AddObjectType(EObjectType::number7);
 	AddObjectType(EObjectType::number8);
 	AddObjectType(EObjectType::number9);
+	AddObjectType(EObjectType::Collision);
 
 	LoadAllResources();
 }

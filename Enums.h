@@ -9,6 +9,7 @@ enum class ERenderLayer : uint8_t
 	Foreground,
 	Actor,
 	Player,
+	Collision,
 	UI,
 	MaxLayers
 };
@@ -23,6 +24,7 @@ enum class EObjectType
 	Goal,
 	BackGround_1,
 	Background_2,
+	Collision,
 	number0,
 	number1,
 	number2,
