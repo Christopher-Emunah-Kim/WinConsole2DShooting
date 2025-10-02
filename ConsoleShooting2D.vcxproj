@@ -134,6 +134,7 @@
   <ItemGroup>
     <ClInclude Include="Common.h" />
     <ClInclude Include="ConsoleShooting2D.h" />
+    <ClInclude Include="Core\ActorFactory.h" />
     <ClInclude Include="Core\GameMaster.h" />
     <ClInclude Include="Core\ResourceManager.h" />
     <ClInclude Include="Core\Singleton.h" />

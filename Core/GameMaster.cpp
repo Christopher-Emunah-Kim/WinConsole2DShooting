@@ -3,6 +3,7 @@
 #include "Objects/K_Actor.h"
 #include "Objects/Background.h"
 #include "ResourceManager.h"
+#include "ActorFactory.h"
 
 GameMaster::~GameMaster()
 {
@@ -26,36 +27,36 @@ void GameMaster::Initialize()
 
 void GameMaster::InitializeGameObjects()
 {
-	//Add ObjectType
-	ResourceManager::GetInstance()->AddObjectType(EObjectType::Player);
-	ResourceManager::GetInstance()->AddObjectType(EObjectType::BackGround_1);
-
-	//Load All Image Resources
-	ResourceManager::GetInstance()->LoadAllResources();
+	ResourceManager::GetInstance()->Initialize();
 
 	//Generate Objects
 	m_airPlayer = std::make_unique<AirPlayer>(EObjectType::Player);
 	m_airPlayer->SetRenderLayer(ERenderLayer::Player);
 
-	Background* background = new Background(WINDOW_WIDTH, WINDOW_HEIGHT, EObjectType::BackGround_1);
-	background->SetRenderLayer(ERenderLayer::Background);
-
-	//Add to Actor List
-	AddActor(background);
+	//일반 Actor들은 Factory클래스 사용
+	Factory::GetInstance()->SpawnActor<Background>(EObjectType::BackGround_1, ERenderLayer::Background);
 }
 
 void GameMaster::Release()
 {
-	for (size_t i = 0; i < m_actors.size(); ++i)
-	{
-		if (m_actors[i])
-		{
-			m_actors[i]->Release();
+	ProcessDestroyPendingActors();
 
-			delete m_actors[i];
-			m_actors[i] = nullptr;
+	for(auto& layerset : m_actors)
+	{
+		for(Actor* actor : layerset.second)
+		{
+			if(actor)
+			{
+				actor->Release();
+				delete actor;
+				actor = nullptr;
+			}
 		}
+		layerset.second.clear();
 	}
+	m_actors.clear();
+
+	ResourceManager::GetInstance()->ReleaseAllResources();
 
 	if (m_airPlayer)
 	{
@@ -73,6 +74,7 @@ void GameMaster::Release()
 
 	m_isInitialized = false;
 
+	m_pendingDestroyActors.clear();
 }
 
 
@@ -84,10 +86,13 @@ void GameMaster::Tick(float deltaSeconds)
 	if (false == m_timeService->CanUpdate())
 		return;
 
-	for(Actor* actor : m_actors)
+	for(const auto& layerPair : m_actors)
 	{
-		if(actor)
-			actor->Tick(deltaSeconds);
+		for(Actor* actor : layerPair.second)
+		{
+			if(actor)
+				actor->Tick(deltaSeconds);
+		}
 	}
 	
 	if (m_airPlayer)
@@ -96,6 +101,8 @@ void GameMaster::Tick(float deltaSeconds)
 	}
 
 	m_screenService->RequestRender();
+
+	ProcessDestroyPendingActors();
 }
 
 void GameMaster::Render(HDC hdc)
@@ -117,21 +124,48 @@ void GameMaster::RenderActors()
 	if (!backGraphics)
 		return;
 
-	//렌더링 순서에 따라 그리기
-	for (ERenderLayer layer = ERenderLayer::Background; layer <= ERenderLayer::UI; layer = static_cast<ERenderLayer>(static_cast<int>(layer) + 1))
+	//map키가 이미 레이어순 정렬되어있으므로 순회하면서 Render
+	for (const auto& layerPair : m_actors)
 	{
-		for (Actor* actor : m_actors)
+		for (Actor* actor : layerPair.second)
 		{
-			if (actor && actor->GetRenderLayer() == layer)
-			{
+			if (actor)
 				actor->Render(*backGraphics);
-			}
-		}
-		if (m_airPlayer && m_airPlayer->GetRenderLayer() == layer)
-		{
-			m_airPlayer->Render(*backGraphics);
 		}
 	}
+
+	//플레이어는 최상단에.
+	if (m_airPlayer)
+	{
+		m_airPlayer->Render(*backGraphics);
+	}
+}
+
+void GameMaster::ProcessDestroyPendingActors()
+{
+	if (m_pendingDestroyActors.empty())
+		return;
+
+	for(Actor* actor : m_pendingDestroyActors)
+	{
+		if(!actor)
+			continue;
+
+		const ERenderLayer layer = actor->GetRenderLayer();
+
+		auto& layerset = m_actors[layer];
+		layerset.erase(actor);
+
+		if (layerset.empty())
+		{
+			m_actors.erase(layer);
+		}
+		
+		delete actor;
+		actor = nullptr;
+	}
+
+	m_pendingDestroyActors.clear();
 }
 
 bool GameMaster::HandleInput(WPARAM wParam, bool isKeyDown)
@@ -157,8 +191,14 @@ void GameMaster::SetUpWindow(HWND hwnd)
 	m_screenService->Initialize(hwnd);
 }
 
-void GameMaster::AddActor(Actor* actor)
+void GameMaster::ReqeustDestroyActor(Actor* actor)
+{
+	if (actor)
+		m_pendingDestroyActors.push_back(actor);
+}
+
+void GameMaster::RegisterActor(Actor* actor)
 {
 	if(actor)
-		m_actors.push_back(actor);
+		m_actors[actor->GetRenderLayer()].insert(actor);
 }

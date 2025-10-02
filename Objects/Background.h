@@ -9,7 +9,7 @@ class Background : public Actor
 {
 public:
 	Background() = delete;
-	explicit Background(int windowWIdth, int windowHeight, EObjectType type);
+	explicit Background(EObjectType type);
 
 	~Background();
 

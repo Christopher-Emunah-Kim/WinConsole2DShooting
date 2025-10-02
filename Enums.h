@@ -23,5 +23,15 @@ enum class EObjectType
 	Goal,
 	BackGround_1,
 	Background_2,
+	number0,
+	number1,
+	number2,
+	number3,
+	number4,
+	number5,
+	number6,
+	number7,
+	number8,
+	number9,
 	MAX
 };

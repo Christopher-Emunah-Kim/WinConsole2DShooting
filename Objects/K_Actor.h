@@ -22,11 +22,13 @@ public:
 	void SetSize(int width, int height);
 	void SetRenderLayer(ERenderLayer layer);
 
+	void MarkPendingDestroy();
+
 	inline const Position& GetPosition() const { return m_position; }
 	inline int GetWidth() const { return m_width; }
 	inline int GetHeight() const { return m_height; }
 	inline ERenderLayer GetRenderLayer() const { return targetLayer; }
-
+	inline bool IsPendingDestroy() const { return isPendingDestroy; }
 protected:
 	Position m_position;
 	Position m_pivot;
@@ -38,5 +40,6 @@ protected:
 
 private:
 	ERenderLayer targetLayer = ERenderLayer::Default;
+	bool isPendingDestroy = false;
 };
 

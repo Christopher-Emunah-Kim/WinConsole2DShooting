@@ -12,13 +12,14 @@ class ResourceManager : public Singleton<ResourceManager>
 {
 private:
 	std::wstring ToWstring(EObjectType type);
+	void LoadAllResources(); 
+	void AddObjectType(EObjectType type);
 
 
 public:
-	void LoadAllResources(); 
+	void Initialize();
 	void ReleaseAllResources();
 	
-	void AddObjectType(EObjectType type);
 	Gdiplus::Bitmap* GetImage(EObjectType type, size_t idx = 0);
 
 private:

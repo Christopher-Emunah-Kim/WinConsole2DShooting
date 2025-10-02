@@ -3,12 +3,12 @@
 #include <cmath>
 
 
-Background::Background(int windowWIdth, int windowHeight, EObjectType type)
+Background::Background(EObjectType type)
 	: Actor(type),m_blockImage(nullptr), m_scrollAccumulator(0.0), 
 	m_blockRowY(0.0), m_blockSpeed(120.0), m_emptyBlockIndex(-1)
 {
-	m_width = windowWIdth;
-	m_height = windowHeight;
+	m_width = WINDOW_WIDTH;
+	m_height = WINDOW_HEIGHT;
 
 	Init();
 }

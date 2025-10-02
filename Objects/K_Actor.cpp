@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "K_Actor.h"
 #include "../Core/ResourceManager.h"
+#include "../Core/GameMaster.h"
 
 
 Actor::Actor(EObjectType type)
@@ -88,5 +89,14 @@ void Actor::SetSize(int width, int height)
 void Actor::SetRenderLayer(ERenderLayer layer)
 { 
 	targetLayer = layer; 
+}
+
+void Actor::MarkPendingDestroy()
+{
+	if(!isPendingDestroy)
+	{
+		isPendingDestroy = true;
+		GameMaster::GetInstance()->ReqeustDestroyActor(this);
+	}
 }
 

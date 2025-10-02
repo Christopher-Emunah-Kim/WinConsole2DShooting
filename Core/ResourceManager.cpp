@@ -1,6 +1,28 @@
 #include "pch.h"
 #include "ResourceManager.h"
 
+void ResourceManager::Initialize()
+{
+	AddObjectType(EObjectType::Player);
+	AddObjectType(EObjectType::Enemy);
+	AddObjectType(EObjectType::Block);
+	AddObjectType(EObjectType::Goal);
+	AddObjectType(EObjectType::Bullet);
+	AddObjectType(EObjectType::BackGround_1);
+	AddObjectType(EObjectType::number0);
+	AddObjectType(EObjectType::number1);
+	AddObjectType(EObjectType::number2);
+	AddObjectType(EObjectType::number3);
+	AddObjectType(EObjectType::number4);
+	AddObjectType(EObjectType::number5);
+	AddObjectType(EObjectType::number6);
+	AddObjectType(EObjectType::number7);
+	AddObjectType(EObjectType::number8);
+	AddObjectType(EObjectType::number9);
+
+	LoadAllResources();
+}
+
 void ResourceManager::LoadAllResources()
 {
 	for(size_t i = 0; i < m_imageTypes.size(); ++i)
